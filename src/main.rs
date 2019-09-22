@@ -1,3 +1,4 @@
+
 fn main() {
 //    Chapter 3 variables
 
@@ -226,6 +227,40 @@ fn main() {
     for number in (1..4).rev() {
         println!("{}!", number);
     }
+
+    //Chapter 4.1 Ownership
+    // Each value in rust has a variable that's called its owner.
+    // there can only be one owner at a time
+    // when the owner goes out of scope the value will be dropped.
+
+    // variable scope.
+    {  // begin scope
+        let s = "hello block"; // s is valid
+        println!("{}",s);
+    } // scoped ended s is no longer valid
+
+    // All previously covered data types are stored on the stack
+    // when their scope is over they are popped off the stack.
+
+    // But we want to look at data that is stored on the heap
+    // and explore how rust knows when to clean up that data.
+
+    // str literals hardcoded are immutable so we need to reach out
+    // to the more complex String type which is heap allocated.
+
+    // :: operator that allows us to namespace this particular function "from"
+    // under the String type
+    let s = String::from("hello");
+
+    // this type of string can be mutated.
+    let mut s = String::from("hello");
+    s.push_str(", world");
+
+    println!("{}", s);
+
+    // these above two types (str literal "", String) deal with memory differently
+    // in the case of the literal we know the contents at compile time so the text
+    // is hardcoded directly into the final executable.
 
 }
 
