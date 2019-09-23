@@ -262,6 +262,74 @@ fn main() {
     // in the case of the literal we know the contents at compile time so the text
     // is hardcoded directly into the final executable.
 
+    // There is a natural point at which we can return the memory our String needs
+    // to the operating system when s goes out of scope. Rust calls a special
+    // function for us called drop and is where the author of String can put the code
+    // to return the memory. Rust calls drop automatically at the closing curly bracket.
+
+    // This is similiar to C++ patter of deallocating resources at the end
+    // of an item's lifetime is sometimes called Resource Acquisition Is Initialization or
+    // RAII
+
+    /*
+
+    This pattern has a profound impact on the way Rust code is written. It may seem simple right
+    now, but the behavior of code can be unexpected in more complicated situations when we want to
+    have multiple variables use the data we’ve allocated on the heap. Let’s explore some of those
+    situations now.
+
+    */
+
+    /***** exploring this ******/
+
+    let s1 = String::from("hello");
+    let s2 = s1;
+
+    // we would assume a copy of the value in s1 is bound to s2
+    // but this isn't what happens.
+
+    // A String is made up of three parts, shown on the left
+    // stored on the stack         contents on the right is on the heap
+    // s1                               index    value
+    // 1. pointer    --------------->   0        h
+    // 2. length     5                  1        e
+    // 3. capacity   5                  2        l
+    //                                  3        l
+    //                                  4        o
+
+
+    // length is how much memory in bytes the contents of String is currently using
+    // capacity is the memory in bytes created by the OS
+    // when we assign s1 to s2 the String data is copied meaning that copied
+    // the stack values which includes the address location
+    // meaning s1 and s2 point to the same string
+
+    // If we didnt copy the stack and copied the heap you can see why the
+    // runtime performance could be very expensive.
+
+    // How this impacts scope if s2 or s1 goes out of scope and rust
+    // calls drop what happens to the other ?
+    // This is known as double free error
+
+    // In Rust this is handled by invalidating the original s1.
+    // So now Rust doesn't do any clean up if s1 goes out of scope.
+
+    // This errors because it is invalid -- borrowed after moved
+    // println!("{}",s1);
+
+    // Typically understood as a shallow copy ** what we just did ** (of the stack)  and a deep copy (complete copy)
+    // Though because rust invalidates the old one it's call a move
+    // we would say s1 moved to s2 and s1 is no longer used.
+
+    // The Rust language design choice is that it will never auto create "deep copies"
+    // So if we wanted a deep copy we would use .clone()
+
+    let s1 = String::from("hello");
+    let s2 = s1.clone();
+
+    println!("s1 = {} | s2 = {}", s1,s2);
+
+    // Stack-Only Data: Copy
 }
 
 
