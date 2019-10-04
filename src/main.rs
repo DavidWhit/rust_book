@@ -10,6 +10,7 @@ fn main() {
     // default values are immutable thus
     // this would fail to compile a = 8;
 
+    // number defaults to i32 and a prefix _ to the var says ignore that its not used elsewhere
     // you need to prefix the var mut to make it mutable
     let mut _y = 10;
     _y = 15; // This is ok
@@ -409,48 +410,115 @@ fn main() {
     // in order to get the length otherwise a borrow after move error would occur
     // WHY though?
     // focus on the error it said "borrow after move"
-    // with the current signature return is -> (String, usize)
+    // with the current signature return is a tuple -> (String, usize)
     //
-    // ok that must mean we have already moved the value s1 and we next are trying to access on it via s.len()
+    // ok that must mean values are being assigned in a left to right order. So the sString has already moved
+    // the value s1 and we next are trying to access on it via s.len()
     // this must mean that if we reversed the return to get the length we would have done it successfully
     // that is to say get the length first then move it.
-    // change fn calculate_length return to be -> (usize, String) and see it is fixed.
+    // change fn calculate_length return to be -> (usize, String) and see that it is fixed.
     // again extremely tedious
 
     // the alternative and I should say idiomatic way is to use references and borrowing
 
-    let s1 = String::from("Hello");
+    // you must allow a mut if you want to mutate a reference passed to a function
+    let mut s1 = String::from("Hello");
     // s1 wasn't moved but borrowed by accessing the reference pointing to the location in memory
     // on the heap.
     // The below fn now has param &s that points to s1 that points to a location on the heap
     // fn param &s points -> s1 points -> heap location
-    // notice the different addresses
-    let len = calculate_length// this is a mutable borrowing(&s1);
-    // s1 still in scope; printing
-    // because the function is holding a reference when it goes out of scope the value it points to will not.
+    // notice the different addresses between s1 and the interal s local in the function.
+    let len = calculate_length_borrowing(&mut s1); // this is a mutable borrowing(&s1);
+                                                   // s1 still in scope; printing
+                                                   // because the function is holding a reference when it goes out of scope the value it points to will not.
     println!("address of s1 {:p} {} {}", &s1, len, s1);
 
-    // reference &
-    // dereference *
-
-    // Alright lets try to modify something that is borrowed
-
-    // Good ideal concept is you can borrow something from a friend and you give it back when you're done.
-
-    let s = String::from("some test string");
-
-    // you can't mutate data that is referenced
-    //change(&s);
-
-    // so we have to add mutable
-    // this is a mutable reference
-
-    let mut s = String::from("some test string");
-
-    change(&mut s);
+    // Basic pointer symbols in most langs
+    // reference    &
+    // dereference  *
 
     // one big restriction
-    //
+    // You can only have one mutable reference to particular piece of data in a particular scope.
+    // This would fail:
+
+    // let mut S = String::from("Hello");
+    // let r1 = &mut s;
+    // let r2 = &mut s;
+    // println!("{}, {}", r1, r2);
+
+    // ^ this makes a bit of sense I should have only one thing referencing a value I will change
+    // within any given scope.
+
+    // This comes with the prevention of a lot of issues involving data races.
+    // Typical conditions in which data races occur.
+    //    Two or more pointers access the same data at the same time.
+    //    At least one of the pointers is being used to write to the data.
+    //    There’s no mechanism being used to synchronize access to the data. IE mutex
+
+    // We could simply mitigate the error if we added a simple block scope
+
+    let mut s = String::from("Hello");
+    {
+        let r1 = &mut s;
+    } // r1 dropped
+
+    let r2 = &mut s;
+
+    // however
+
+    let r1 = &s; // no problem immutable borrow
+    let r2 = &s; // no problem
+                 // let r3 = &mut s; // big problem mutable borrow
+
+    // doesn't allow to mix non mutable with a immutable ref.
+    // in basic terms I can have multiple readers but I cannot have readers and writers point to the same data in the same scope.
+
+    // important to keep in mind the scope is also until the last time the reference was used
+    let mut s = String::from("hello");
+
+    let r1 = &s; // no problem
+    let r2 = &s; // no problem
+    println!("{} and {}", r1, r2); // just need to make sure are readers are used before we make an immutable ref
+                                   // r1 and r2 are no longer used after this point
+
+    let r3 = &mut s; // no problem
+    println!("{}", r3);
+
+    // ******************** dangling references (hints to lifetimes in chapter 10) ********************
+
+    // Rust compiler ensures that dangling refs will not happen
+    // by not allowing the data to go out of scope before the reference to the data does
+
+    let reference_to_nothing = dangle();
+    // with the fn fixed we dont error
+
+    println!("{}", reference_to_nothing);
+
+    // recap
+    // At any given time you can have either one mutable reference or any number of immutable references.
+    // references must always be valid
+
+    // ++++++++++++ 4.3 The slice type ++++++++++++
+
+    // Doesn't have ownership
+    // they are refs to a continguous sequence of elements in a collection rather than the whole collection.
+
+    // making a function that returns the first word in a string.
+}
+
+// 4.3
+fn first_word(s: &String) -> usize {
+    let bytes = s.as_bytes();
+
+    // iter() returns each element in the collection
+    // enumerate() wraps the result of iter and returns each element
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return i;
+        }
+    }
+
+    s.len();
 }
 
 // ************* 3.3 function declaration *************
@@ -483,11 +551,11 @@ fn calculate_length(s: String) -> (String, usize) {
     (s, length)
 }
 
-fn calculate_length_borrowing(s: &String) -> usize {
+fn calculate_length_borrowing(s: &mut String) -> usize {
     println!("address of &s -> {:p}", &s);
     s.len()
 } // s is out of scope
 
-fn change(some_string: &mut String) {
-    some_string.push_str(", addition");
-}
+fn dangle() -> String {
+    String::from("hello")
+} // now s is out of scope and dropped the easy way to resolve this is to move it
