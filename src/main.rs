@@ -691,6 +691,212 @@ fn main() {
 
     // p1.distance(&p2);
     // (&p1).distance(&p2);
+
+    // methods with more parameters
+
+    let rect1 = Rectangle {
+        width: 30,
+        height: 50,
+    };
+    let rect2 = Rectangle {
+        width: 10,
+        height: 40,
+    };
+    let rect3 = Rectangle {
+        width: 60,
+        height: 45,
+    };
+
+    println!("Can rect1 hold rect2? {}", rect1.can_hold(&rect2));
+    println!("Can rect1 hold rect3? {}", rect1.can_hold(&rect3));
+
+    // Associated Functions (similiar to static functions)
+    // often used as
+    // these are not considered methods because they don't have an instance
+    // like String::from is an associated method
+    // add square function to Rectangle as an associated function
+    let some_square = Rectangle::square(5);
+
+    println!("Some square {:#?}", some_square);
+
+    // you are also allowed to use multiple imp blocks though this will be covered more in depth in
+    // chapter 10.
+
+    // Chapter 6 enums and pattern matching
+
+    // Recap: enumerations all you to define a type by enumerating its possible values
+    // Rust also has the Option enum like scala
+    // then combining enums with match
+
+    // Also remember that enums are great and often better than structs when the data
+    // can be enumerated; such as, IP address versions. Where you're certain the outcome is of
+    // of enumerated field
+    // enum IpAddrKind added in the enum section at the bottom
+    // they can be used now as a type
+    // like fn route(ip_kind: IpAddrKind) {}
+    // then callable with either variant
+    // route(IpAddrKind::V4);
+    // route(IpAddrKind::V6);
+
+    // Though we don't have the address leaning on structs to contain our new enum type.
+    // see struct IpAddr
+
+    let home = IpAddr {
+        address: String::from("127.0.0.1"),
+        kind: IpAddrKind::V4,
+    };
+
+    // * HOWEVER WE CAN GET MORE MEANING OUT OF THE ENUM *
+    // to be more concise we can add the value of the address to the enum
+    // rather than an enum in a struct
+    // ** see enum IpAddr
+    // where as if we left the struct in place we are stuck with String as a type for both
+    // though with enum we can specify different concrete types that
+    // IE now can define them differently
+
+    let home = IpAddrEnum::V4(127, 0, 0, 1);
+    let loopback = IpAddrEnum::V6(String::from("::1"));
+
+    // this is common enough that the std lib defines them as such
+    // struct Ipv4Addr {
+    //     // --snip--
+    // }
+
+    // struct Ipv6Addr {
+    //     // --snip--
+    // }
+
+    // like we just did it but enums a struct vs a struct with an enum when we first started.
+    // enum IpAddr {
+    //     V4(Ipv4Addr),
+    //     V6(Ipv6Addr),
+
+    // while here if we had the IpAddr we wouldnt conflict becuase we havent imported anything
+
+    // Alright we created a message Enum type that matches the book
+    // with 4 variants
+
+    // we could have defined 4 structs but if we used different structs
+
+    // struct QuitMessage; // unit struct
+    // struct MoveMessage {
+    //     x: i32,
+    //     y: i32,
+    // }
+    // struct WriteMessage(String); // tuple struct
+    // struct ChangeColorMessage(i32, i32, i32); // tuple struct
+    // each have there own type we couldnt easily define a function to take
+    // all as we could with Message
+    // Also we have a similiarity in that we can implement functions on enums
+    // see below
+
+    let m = Message::Write(String::from("hello"));
+    m.call(); // does nothing as nothing was actually implemented
+
+    // The Option enum as define by the std lib
+    // enum Option<T> {
+    //   Some(T),
+    //   None,
+    // }
+
+    // where <T> is the generic type or some variant of the Option
+    // getting an idea how to use Option (no need to import as it is included)
+
+    let some_number = Some(5);
+    let some_string = Some("a string");
+
+    // if we use None rather than some we need to tell Rust what it is
+    // as the compiler can't infer the type.
+    let absent_number: Option<i32> = None;
+
+    // none also doesnt have a display; makes sense.
+    // println!("{} {} {}", some_number, some_string, absent_number);
+
+    // how do you get the T value out of Some variant when you have a value of type Option<T>
+    // so you can use that value? I'm thinking unboxing... but they haven't talked about that
+    // IMPORTANT: Become fmailiar withthe methods on Option<T> will be extremely useful
+
+    // Match Control Flow Operator
+    // Rust provides control flow operator called match to compare patterns of literal values,
+    // variable names, wildcards, and many other things dicussed in chp 18
+
+    // lets to an inner scoped enum example as the book
+    enum Coin {
+        Penny,
+        Nickel,
+        Dime,
+        Quarter,
+    }
+
+    // unlike an if that requires a bool we can take any type
+    fn value_in_cents(coin: Coin) -> u8 {
+        match coin {
+            Coin::Penny => 1,
+            Coin::Nickel => 5,
+            // or add a block example
+            // Coin::Dime => 10,
+            Coin::Dime => {
+                println!("You got a dime");
+                10
+            }
+            Coin::Quarter => 25,
+        }
+    }
+
+    let dime = value_in_cents(Coin::Dime);
+
+    println!("Dime {}", dime);
+
+    // This is slick, something I haven't at least seen in other langs
+
+    #[derive(Debug)] // to view the state
+    enum UsState {
+        Alabama,
+        Alaska, // etc
+    }
+
+    enum CoinBindValExample {
+        Penny,
+        Nickel,
+        Dime,
+        Quarter(UsState),
+    }
+
+    fn value_in_cents_match_bind(coin: CoinBindValExample) -> u8 {
+        match coin {
+            CoinBindValExample::Penny => 1,
+            CoinBindValExample::Nickel => 5,
+            // or add a block example
+            // Coin::Dime => 10,
+            CoinBindValExample::Dime => {
+                println!("You got a dime");
+                10
+            }
+            CoinBindValExample::Quarter(state) => {
+                println!("State quarter from {:?}!", state);
+                25
+            }
+        }
+    }
+
+    let coin = value_in_cents_match_bind(CoinBindValExample::Quarter(UsState::Alabama));
+
+    println!(
+        "The quarter value is {} and show state in function print",
+        coin
+    );
+
+    // Matching with Option<T>
+    fn plus_one(x: Option<i32>) -> Option<i32> {
+        match x {
+            None => None,
+            Some(i) => Some(i + 1),
+        }
+    }
+
+    let five = Some(5);
+    let six = plus_one(five);
+    let none = plus_one(None);
 }
 
 // FUNCTIONS ********************************
@@ -787,6 +993,11 @@ fn dangle() -> String {
 } // now s is out of scope and dropped the easy way to resolve this is to move it
 
 // STRUCTS **************************************************
+struct IpAddr {
+    kind: IpAddrKind,
+    address: String,
+}
+
 #[derive(Debug)]
 struct Rectangle {
     width: u32,
@@ -794,8 +1005,19 @@ struct Rectangle {
 }
 
 impl Rectangle {
+    fn square(size: u32) -> Rectangle {
+        Rectangle {
+            width: size,
+            height: size,
+        }
+    }
+
     fn area(&self) -> u32 {
         self.width * self.height
+    }
+
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.width > other.width && self.height > other.height
     }
 }
 
@@ -808,3 +1030,25 @@ struct User {
 
 struct Color(i32, i32, i32);
 struct Point(i32, i32, i32);
+
+/*************** ENUMS ****************/
+enum IpAddrKind {
+    V4,
+    V6,
+}
+
+enum IpAddrEnum {
+    V4(u8, u8, u8, u8),
+    V6(String),
+}
+
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(i32, i32, i32),
+}
+
+impl Message {
+    fn call(&self) {}
+}
