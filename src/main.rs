@@ -897,6 +897,89 @@ fn main() {
     let five = Some(5);
     let six = plus_one(five);
     let none = plus_one(None);
+
+    // Matching everything else use the _ placeholder
+    // the () is unit value
+    let some_u8_value = 0u8;
+    match some_u8_value {
+        1 => println!("one"),
+        3 => println!("three"),
+        5 => println!("five"),
+        7 => println!("seven"),
+        _ => () // nothing happens
+    }
+
+    // when you just care about one value use if let
+
+    // consider this
+    let a_value = Some(5);
+
+    match a_value  {
+        Some(5) => println!("five"),
+        _ => (),
+    }
+
+    // just do this
+
+    if let Some(v) = Some(5) {
+        println!("Yeah we got the value: {}", v);
+    }
+
+    let mut count = 0;
+
+    let coin = CoinBindValExample::Quarter(UsState::Alaska);
+
+    match coin {
+        CoinBindValExample::Quarter(state) => println!("State quarter from {:#?}" ,state),
+        _ => count += 1
+    }
+
+    // or use if let else
+    let mut count = 0;
+
+    let coin = CoinBindValExample::Quarter(UsState::Alaska);
+
+    if let CoinBindValExample::Quarter(state) = coin {
+        println!("State quarter from {:#?}", state);
+    } else  {
+        count += 1;
+    }
+
+
+    // **************************** Chapter 7 ************************************
+
+    // crates either binaries or libs
+    // A crate root is a soruce file that the rust compiler starts from and makes up the root
+    // module of your crate.
+    // A package is one or more crates that provides a set of functionality. A package contains a cargo.toml
+    // file that describes how to build those crates
+
+    // A package must contain zero or one library crate and no more. It can contain several binary crates,
+    // but it must conaint at least one create.
+
+    // cargo is name specific
+    // that is when we call cargo new some_project
+    // it creates and application with a cargo.toml and a src dir
+    // where main is in src
+    // Cargo knows where main is by convention
+    // also if the package directory contains src/lib.rs Cargo passes the crate root files to rustc
+    // to build the lib or binary
+
+    // This needs read over ^
+
+
+    // Defining Modules to Control Scope and Privacy
+    // use keyword to bring a path into scope and pub to make items public
+    // and the as keyword, external packages, and glob operator
+
+    // For now though we are focused on the modules.
+
+    // so if we wanted to make a new lib
+    // cargo new --lib restaurant
+
+
+
+
 }
 
 // FUNCTIONS ********************************
