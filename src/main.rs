@@ -1,3 +1,157 @@
+// FUNCTIONS ********************************
+fn area_struct(r: &Rectangle) -> u32 {
+    r.height * r.width
+}
+
+fn area_tuple(dimensions: (u32, u32)) -> u32 {
+    dimensions.0 * dimensions.1
+}
+
+fn area(width: u32, height: u32) -> u32 {
+    width * height
+}
+
+// 5.1
+// will create a user with defaults and takes email and username
+fn build_user(email: String, username: String) -> User {
+    User {
+        // Note repeating the fields is tedious so you can do
+        // because it makes sense to name the params the same a the field
+        email,
+        username,
+        active: true,
+        sign_in_count: 1,
+    }
+}
+
+// 4.3
+
+fn first_word_redo(s: &String) -> &str {
+    let bytes = s.as_bytes();
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[..i];
+        }
+    }
+    &s[..]
+}
+
+// extremely brittle and error prone thus slices are introduced to avoid logic that trys to maintain sync
+fn first_word(s: &String) -> usize {
+    let bytes = s.as_bytes();
+
+    // iter() returns each element in the collection
+    // enumerate() wraps the result of iter and returns each element tuple of (index, ref) (mainly for getting the index)
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            // byte literal syntax
+            return i;
+        }
+    }
+
+    s.len()
+}
+
+// ************* 3.3 function declaration *************
+// uses snake case
+// can be at the top or bottom outside of main
+// example
+fn another_function(x: i32, y: i32) -> i32 {
+    x + y
+}
+
+fn takes_ownership(some_sting: String) {
+    println!("{}", some_sting);
+}
+
+fn makes_copy(some_integer: i32) {
+    println!("{}", some_integer);
+}
+
+fn gives_onwership() -> String {
+    let some_string = String::from("hello");
+    some_string
+}
+
+fn takes_and_gives_back(a_string: String) -> String {
+    a_string + " with more"
+}
+
+fn calculate_length(s: String) -> (String, usize) {
+    let length = s.len();
+    (s, length)
+}
+
+fn calculate_length_borrowing(s: &mut String) -> usize {
+    println!("address of &s -> {:p}", &s);
+    s.len()
+} // s is out of scope
+
+fn dangle() -> String {
+    String::from("hello")
+} // now s is out of scope and dropped the easy way to resolve this is to move it
+
+// STRUCTS **************************************************
+struct IpAddr {
+    kind: IpAddrKind,
+    address: String,
+}
+
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn square(size: u32) -> Rectangle {
+        Rectangle {
+            width: size,
+            height: size,
+        }
+    }
+
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.width > other.width && self.height > other.height
+    }
+}
+
+struct User {
+    username: String,
+    email: String,
+    sign_in_count: u64,
+    active: bool,
+}
+
+struct Color(i32, i32, i32);
+struct Point(i32, i32, i32);
+
+/*************** ENUMS ****************/
+enum IpAddrKind {
+    V4,
+    V6,
+}
+
+enum IpAddrEnum {
+    V4(u8, u8, u8, u8),
+    V6(String),
+}
+
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(i32, i32, i32),
+}
+
+impl Message {
+    fn call(&self) {}
+}
+
 fn main() {
     // +++++++++++++++++++++ Chapter 3 variables and Mutability +++++++++++++++++++++
 
@@ -906,7 +1060,7 @@ fn main() {
         3 => println!("three"),
         5 => println!("five"),
         7 => println!("seven"),
-        _ => () // nothing happens
+        _ => (), // nothing happens
     }
 
     // when you just care about one value use if let
@@ -914,7 +1068,7 @@ fn main() {
     // consider this
     let a_value = Some(5);
 
-    match a_value  {
+    match a_value {
         Some(5) => println!("five"),
         _ => (),
     }
@@ -930,8 +1084,8 @@ fn main() {
     let coin = CoinBindValExample::Quarter(UsState::Alaska);
 
     match coin {
-        CoinBindValExample::Quarter(state) => println!("State quarter from {:#?}" ,state),
-        _ => count += 1
+        CoinBindValExample::Quarter(state) => println!("State quarter from {:#?}", state),
+        _ => count += 1,
     }
 
     // or use if let else
@@ -941,197 +1095,252 @@ fn main() {
 
     if let CoinBindValExample::Quarter(state) = coin {
         println!("State quarter from {:#?}", state);
-    } else  {
+    } else {
         count += 1;
     }
-
 
     // **************************** Chapter 7 ************************************
 
     // crates either binaries or libs
-    // A crate root is a soruce file that the rust compiler starts from and makes up the root
+    // A CRATE:
+    // root is a source file that the rust compiler starts from and makes up the root
     // module of your crate.
-    // A package is one or more crates that provides a set of functionality. A package contains a cargo.toml
+
+    // A PACKAGE:
+    // Is one or more crates that provides a set of functionality. A package contains a cargo.toml
     // file that describes how to build those crates
 
-    // A package must contain zero or one library crate and no more. It can contain several binary crates,
-    // but it must conaint at least one create.
-
-    // cargo is name specific
-    // that is when we call cargo new some_project
-    // it creates and application with a cargo.toml and a src dir
-    // where main is in src
-    // Cargo knows where main is by convention
-    // also if the package directory contains src/lib.rs Cargo passes the crate root files to rustc
+    // Cargo is name specific
+    // That is when we call cargo new some_project
+    // tt creates and application with a cargo.toml and a src dir
+    // Also if the package directory contains src/lib.rs Cargo passes the crate root files to rustc
     // to build the lib or binary
 
-    // This needs read over ^
+    // Modules:
+    // Allows code to be organized within a crate
+    // Controls privacy of items public or private
+    // Example
 
+    // continued in restaurant project chapter 7 modules lib
 
-    // Defining Modules to Control Scope and Privacy
-    // use keyword to bring a path into scope and pub to make items public
-    // and the as keyword, external packages, and glob operator
+    // CHAPTER 8 collections
+    // Vectors, string, hash map
+    // others mentioned https://doc.rust-lang.org/std/collections/index.html
 
-    // For now though we are focused on the modules.
+    // declare a vec that holds type <T>
+    let mut v: Vec<i32> = Vec::new();
+    v.push(30);
 
-    // so if we wanted to make a new lib
-    // cargo new --lib restaurant
+    // declare a vec that holds the next type used
+    let mut h = Vec::new();
+    h.push("343");
 
+    // or use the macro with some values
+    // and make this one immutable
+    let d = vec![1, 3, 2, 34, 3, 23];
 
-
-
-}
-
-// FUNCTIONS ********************************
-fn area_struct(r: &Rectangle) -> u32 {
-    r.height * r.width
-}
-
-fn area_tuple(dimensions: (u32, u32)) -> u32 {
-    dimensions.0 * dimensions.1
-}
-
-fn area(width: u32, height: u32) -> u32 {
-    width * height
-}
-
-// 5.1
-// will create a user with defaults and takes email and username
-fn build_user(email: String, username: String) -> User {
-    User {
-        // Note repeating the fields is tedious so you can do
-        // because it makes sense to name the params the same a the field
-        email,
-        username,
-        active: true,
-        sign_in_count: 1,
-    }
-}
-
-// 4.3
-
-fn first_word_redo(s: &String) -> &str {
-    let bytes = s.as_bytes();
-    for (i, &item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            return &s[..i];
+    // again recall block scopes
+    {
+        let mut d = vec![1, 23, 23, 2, 2, 3, 2];
+        for x in &mut d {
+            *x += 50
         }
-    }
-    &s[..]
-}
-
-// extremely brittle and error prone thus slices are introduced to avoid logic that trys to maintain sync
-fn first_word(s: &String) -> usize {
-    let bytes = s.as_bytes();
-
-    // iter() returns each element in the collection
-    // enumerate() wraps the result of iter and returns each element tuple of (index, ref) (mainly for getting the index)
-    for (i, &item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            // byte literal syntax
-            return i;
+        for x in d {
+            println!("d inner block -> {}", x);
         }
+    } // shadowed d is freed
+
+    // if you just use d it will be moved
+    for x in &d {
+        println!("d out of block -> {}", x);
     }
 
-    s.len()
-}
+    // reading single values
+    let third = &d[2];
 
-// ************* 3.3 function declaration *************
-// uses snake case
-// can be at the top or bottom outside of main
-// example
-fn another_function(x: i32, y: i32) -> i32 {
-    x + y
-}
-
-fn takes_ownership(some_sting: String) {
-    println!("{}", some_sting);
-}
-
-fn makes_copy(some_integer: i32) {
-    println!("{}", some_integer);
-}
-
-fn gives_onwership() -> String {
-    let some_string = String::from("hello");
-    some_string
-}
-
-fn takes_and_gives_back(a_string: String) -> String {
-    a_string + " with more"
-}
-
-fn calculate_length(s: String) -> (String, usize) {
-    let length = s.len();
-    (s, length)
-}
-
-fn calculate_length_borrowing(s: &mut String) -> usize {
-    println!("address of &s -> {:p}", &s);
-    s.len()
-} // s is out of scope
-
-fn dangle() -> String {
-    String::from("hello")
-} // now s is out of scope and dropped the easy way to resolve this is to move it
-
-// STRUCTS **************************************************
-struct IpAddr {
-    kind: IpAddrKind,
-    address: String,
-}
-
-#[derive(Debug)]
-struct Rectangle {
-    width: u32,
-    height: u32,
-}
-
-impl Rectangle {
-    fn square(size: u32) -> Rectangle {
-        Rectangle {
-            width: size,
-            height: size,
-        }
+    match d.get(2) {
+        Some(third) => println!("we got something {}", third),
+        None => println!("Nothing found"),
     }
 
-    fn area(&self) -> u32 {
-        self.width * self.height
+    let first = &v[0];
+    // first is ok to use until we change the underlying vector
+    println!("first val = {}", first);
+    v.push(40);
+    //    println!("first val = {}", first); -- would fail here
+
+    // Think about the above we said v was mutable but first was not
+    // we could use the first var only before changes to v
+    // this would break the contract of saying first was immutable.
+
+    // Recall borrowing rules https://doc.rust-lang.org/1.8.0/book/references-and-borrowing.html
+
+    // 1. one or more references to a resource
+    // 2. exactly 1 mutable reference
+
+    // 8.2 STRINGS
+
+    // Rust has one core language which is the string slice str
+    // that is usually seen in its borrowed form &str
+
+    // String literals are store in the programs binary and are therefore string slices
+
+    // the "String" type provided by the rust standard library rather than coded into core
+    // is a growable, mutable, owned, UTF-8 encoded string type.
+
+    // In rust people refer to "strings" they usually mean the String and &str types not just one
+    // of those. Both are heavily in Rusts std lib and UTF-8 encoded
+
+    // Rust std lib also includes a number of other string types like OsString, OsStr, CString, CStr
+    // see the convention of String and str they refer to Owned and Borrowed
+
+    let mut s = String::new();
+
+    // typically we will load with initial data we want to start the string with. For that we use the
+    // to_string method which is available on any type that implements the Display trait as string literals do.
+
+    let data = "some string literal";
+
+    let s = data.to_string();
+
+    // or on the literal itself
+
+    let s = "another string literal".to_string();
+
+    // or by the String module
+
+    let s = String::from("another literal to String");
+
+    // appending to a string with push_str and push
+
+    let mut s = String::from("foo");
+
+    s.push_str("_bar");
+
+    // or push a char
+
+    s.push('d');
+
+    println!("{}", s);
+
+    // Concatenation with the +
+
+    let s1 = String::from("hello, ");
+    let s2 = String::from("World, ");
+
+    // s1 was moved
+    let s3 = s1 + &s2;
+    // s1 not accessible
+    println!("{}", s3);
+
+    // or as I like
+    let s1 = String::from("tic");
+    let s2 = String::from("tac");
+    let s3 = String::from("toe");
+
+    let s = format!("{}-{}-{}", s1, s2, s3);
+
+    println!("{}", &s);
+
+    // Rust can't access strings as indexes
+    //    let h = s[0];
+
+    // A "String" is a wrapper over a Vec<u8>
+    // examples
+    let len = String::from("Hola").len(); // len is 4
+    let len = String::from("Здравствуйте").len(); // not 12 but 24 because it takes 24 bytes to encode to UTF-8
+
+    // More complications and why strings are way more complicated than people give credit.
+    // Bytes and Scalar Values and Grapheme Clusters! Oh My!
+
+    //A final reason Rust doesn’t allow us to index into a String to get a character is that indexing
+    // operations are expected to always take constant time (O(1)). But it isn’t possible to guarantee
+    // that performance with a String, because Rust would have to walk through the contents from the
+    // beginning to the index to determine how many valid characters there were.
+
+    // The alternative is slicing Strings
+
+    let hello = "Здравствуйте";
+
+    // 0..1 would panic for the same reason as before
+    let s = &hello[0..4]; // use with caution
+
+    // iterating over strings
+    for c in "नमस्ते".chars() {
+        println!("{}", c);
     }
 
-    fn can_hold(&self, other: &Rectangle) -> bool {
-        self.width > other.width && self.height > other.height
+    for b in "नमस्ते".bytes() {
+        println!("{}", b);
     }
-}
 
-struct User {
-    username: String,
-    email: String,
-    sign_in_count: u64,
-    active: bool,
-}
+    // hashMaps
+    //    use std::collections::HashMap;
+    //
+    //    let mut scores = HashMap::new();
+    //
+    //    scores.insert(String::from("Blue"), 10);
+    //    scores.insert(String::from("Yellow"), 50); // Final Answer  why Rust doesnt allow indexing
 
-struct Color(i32, i32, i32);
-struct Point(i32, i32, i32);
+    // or
 
-/*************** ENUMS ****************/
-enum IpAddrKind {
-    V4,
-    V6,
-}
+    use std::collections::HashMap;
 
-enum IpAddrEnum {
-    V4(u8, u8, u8, u8),
-    V6(String),
-}
+    let teams = vec![String::from("Blue"), String::from("Yellow")];
+    let initial_scores = vec![10, 50];
 
-enum Message {
-    Quit,
-    Move { x: i32, y: i32 },
-    Write(String),
-    ChangeColor(i32, i32, i32),
-}
+    let scores: HashMap<_, _> = teams.iter().zip(initial_scores.iter()).collect();
 
-impl Message {
-    fn call(&self) {}
+    // if you plan on using scores after you need ref
+    for (x, y) in &scores {
+        println!("key {}, value {}", x, y)
+    }
+
+    // Hash Maps and Ownership
+    let field_name = String::from("Favorite color");
+    let field_value = String::from("Green");
+
+    let mut map = HashMap::new();
+    map.insert(field_name, field_value); // fields are moved here
+
+    // Accessing values in a hash Map
+    if let Some(item) = map.get("Favorite color") {
+        println!("{}", item);
+    }
+
+    // Update by overwriting
+    // just insert with the same key
+
+    // only insert a value if a key has no value
+
+    let mut scores = HashMap::new();
+    scores.insert(String::from("Blue"), 10);
+
+    scores.entry(String::from("Yellow")).or_insert(50);
+    let d = scores.entry(String::from("Blue")).or_insert(50);
+    *d = 60;
+
+    println!("{:?}", scores);
+
+    // CHAPTER 9 ERROR Handling
+    // panic! macro
+
+    // By default the panic! macro will undwind the stack walking back up the stack
+    // cleaning up allocated memory; however, this is a lot of work.
+    // The alternative is to just immediately abort the application making the OS clean up memory.
+    // This can be done by adding [profile] section to cargo.toml
+    // For example if you wanted to abort in release mode you would set
+    //
+    //    [profile.release]
+    //    panic = 'abort'
+
+    // in the cargo.toml file.
+
+    // We can also force a panic via the macro
+    // panic!("Crash and Burn Bro");
+
+    // Rust helps to prevent buffer over read, as in, trying to read data in a vec that is out of bounds.
+
+    // If we wanted to read from the backtrace we can setup the cargo command to do
+    // RUST_BACKTRACE=1 cargo run
 }
