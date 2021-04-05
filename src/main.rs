@@ -19,6 +19,7 @@ use chapters::chapter_4::*;
 use chapters::chapter_5::{defining_and_init_structs, using_structs_and_method_syntax};
 use chapters::chapter_6::{enum_and_flow_control, enums};
 use chapters::chapter_8::{working_with_hashmap, working_with_vectors};
+use chapters::chapter_9::recoverable_errors_with_result;
 
 fn main() {
     //http://doc.rust-lang.org/rust-by-example/mod/split.html
@@ -96,4 +97,5 @@ fn main() {
 
     // If we wanted to read from the backtrace we can setup the cargo command to do
     // RUST_BACKTRACE=1 cargo run
+    recoverable_errors_with_result();
 }
