@@ -20,7 +20,9 @@ use chapters::chapter_5::{defining_and_init_structs, using_structs_and_method_sy
 use chapters::chapter_6::{enum_and_flow_control, enums};
 use chapters::chapter_8::{working_with_hashmap, working_with_vectors};
 use chapters::chapter_9::recoverable_errors_with_result;
-use chapters::chapter_10::{using_generic_data_types, traits_defining_shared_behavior };
+use chapters::chapter_10::{using_generic_data_types
+                           , traits_defining_shared_behavior
+ , validating_references_with_lifetimes };
 
 fn main() {
     //http://doc.rust-lang.org/rust-by-example/mod/split.html
@@ -104,4 +106,5 @@ fn main() {
     // Chapter 10
     using_generic_data_types();
     traits_defining_shared_behavior();
+    validating_references_with_lifetimes();
 }

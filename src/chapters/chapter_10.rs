@@ -15,7 +15,7 @@ pub fn using_generic_data_types() {
     // Removing Duplication by Extracting a Function
     // skipped most this is basic ABC stuff identify reusable code and wrap it in a func
 
-    let number_list = vec![34,50,25,100,65];
+    // let number_list = vec![34,50,25,100,65];
     //
     // let mut largest = number_list[0];
     //
@@ -51,7 +51,7 @@ pub fn using_generic_data_types() {
     //     }
     //     largest
     // }
-    // let char_list = vec!['d','a','e','f','c'];
+    let char_list = vec!['d','a','e','f','c'];
     // let result = largest(&number_list);
     // let result2 = largest(&char_list);
 
@@ -338,8 +338,183 @@ pub fn traits_defining_shared_behavior() {
      */
 
     // with sugar
-    pub fn notify_mult_trait(item: &(impl Summary + Display)) {};
+    pub fn notify_mult_trait(item: &(impl Summary + Display)) {}
 
     // traitbound
-    pub fn notify_mult_trait_bound_syntax<T:Summary + Display>(item: &T) {};
+    pub fn notify_mult_trait_bound_syntax<T:Summary + Display>(item: &T) {}
+
+    //*** Clearer Trait Bound with where Clauses
+
+    /*
+    Using too many trait bounds has its downsides. Each generic has its own trait bounds,
+    so functions with multiple generic type parameters can contain lots of trait bound information
+    between the function’s name and its parameter list, making the function signature hard to read.
+    For this reason, Rust has alternate syntax for specifying trait bounds inside a where clause
+    after the function signature. So instead of writing this:
+
+    fn some_function<T: Display + Clone, U: Clone + Debug>(t: &T, u: &U) -> i32 {
+        we can use a where clause, like this:
+
+
+        fn some_function<T, U>(t: &T, u: &U) -> i32
+            where T: Display + Clone,
+                  U: Clone + Debug
+        {}
+
+    This function’s signature is less cluttered: the function name, parameter list, and return type
+    are close together, similar to a function without lots of trait bounds.
+
+    */
+
+    // *** Returning Types that Implement Traits
+
+    fn returns_summarizable() -> impl Summary {
+        Tweet {
+            username: String::from("horse_ebooks"),
+            content: String::from(
+                "of course, as you probably already know, people",
+            ),
+            reply: false,
+            retweet: false,
+        }
+    }
+
+    /*
+
+    The ability to return a type that is only specified by the trait it implements is especially
+    useful in the context of closures and iterators, which we cover in Chapter 13. Closures and
+    iterators create types that only the compiler knows or types that are very long to specify.
+    The impl Trait syntax lets you concisely specify that a function returns some type that
+    implements the Iterator trait without needing to write out a very long type.
+
+    However, you can only use impl Trait if you’re returning a single type. For example, this code
+    that returns either a NewsArticle or a Tweet with the return type specified as impl Summary
+    wouldn’t work:
+
+    Doesn't work because how impl Trait sytax is implemented in the compiler
+    This is later discussed in chapter 17 "using trait objects that allows values of different
+    types
+
+    fn returns_summarizable2(switch: bool) -> Box<dyn Summary> {
+        let x = if switch {
+            NewsArticle {
+                headline: String::from(
+                    "Penguins win the Stanley Cup Championship!",
+                ),
+                location: String::from("Pittsburgh, PA, USA"),
+                author: String::from("Iceburgh"),
+                content: String::from(
+                    "The Pittsburgh Penguins once again are the best \
+                 hockey team in the NHL.",
+                ),
+            }
+        } else {
+            Tweet {
+                username: String::from("horse_ebooks"),
+                content: String::from(
+                    "of course, as you probably already know, people",
+                ),
+                reply: false,
+                retweet: false,
+            }
+        }
+    }
+
+    Returning either a NewsArticle or a Tweet isn’t allowed due to restrictions around how the impl
+    Trait syntax is implemented in the compiler. We’ll cover how to write a function with this
+    behavior in the “Using Trait Objects That Allow for Values of Different Types” section of
+    Chapter 17.
+    */
+
+    // *** Fixing the largest Function with Trait Bounds
+    fn largest<T: PartialOrd + Copy>(list: &[T]) ->  T {
+        let mut largest = list[0];
+
+        for &item in list {
+            if item > largest {
+                largest = item;
+            }
+        }
+
+        largest
+    }
+
+    let number_list = vec![2,32,43,11,23,2];
+    let char_list = vec!['a','z','x','A','d'];
+
+    let number_result = largest(&number_list);
+    let char_result = largest(&char_list);
+
+    println!("The largest in number_list ===> {} and the largest in char is ===> {}",
+        number_result,
+        char_result
+    );
+
+    struct Pair<T> {
+        x: T,
+        y: T,
+    }
+
+    // *** Using Trait Bound to Conditionally Implement Methods
+
+
+    /* By using a trait bound with an impl block that uses generic type parameters, we can
+       implement methods conditionally for types that implement the specified traits. For example,
+       the type Pair<T> in Listing 10-16 always implements the new function. But Pair<T> only
+       implements the cmp_display method if its inner type T implements the PartialOrd trait that
+       enables comparison and the Display trait that enables printing.
+     */
+    impl <T> Pair<T> {
+        fn new(x:T, y: T ) -> Self {
+            Self { x, y}
+        }
+    }
+
+    impl<T: Display + PartialOrd> Pair<T> {
+        fn cmd_display(&self) {
+           if self.x >= self.y {
+               println!("The largest member is x = {}", self.x);
+           } else {
+               println!("The largest member is y = {}", self.y);
+           }
+        }
+    }
+
+    let x = Pair::new(3,40);
+    let y = Pair::new('s','a');
+    x.cmd_display();
+    y.cmd_display();
+
+    /*
+    Traits and trait bounds let us write code that uses generic type parameters to reduce
+    duplication but also specify to the compiler that we want the generic type to have particular
+    behavior. The compiler can then use the trait bound information to check that all the concrete
+    types used with our code provide the correct behavior. In dynamically typed languages, we would
+    get an error at runtime if we called a method on a type which didn’t define the method.
+    But Rust moves these errors to compile time so we’re forced to fix the problems before our
+    code is even able to run. Additionally, we don’t have to write code that checks for behavior
+    at runtime because we’ve already checked at compile time. Doing so improves performance without
+    having to give up the flexibility of generics.
+
+    Another kind of generic that we’ve already been using is called lifetimes. Rather than ensuring
+    that a type has the behavior we want, lifetimes ensure that references are valid as long as we
+    need them to be. Let’s look at how lifetimes do that.
+    */
+}
+
+fn validating_references_with_lifetimes() {
+    /*
+    One detail we didn’t discuss in the “References and Borrowing” section in Chapter 4 is that
+    every reference in Rust has a lifetime, which is the scope for which that reference is valid.
+    Most of the time, lifetimes are implicit and inferred, just like most of the time, types are
+    inferred. We must annotate types when multiple types are possible. In a similar way, we must
+    annotate lifetimes when the lifetimes of references could be related in a few different ways.
+    Rust requires us to annotate the relationships using generic lifetime parameters to ensure the
+    actual references used at runtime will definitely be valid.
+
+    The concept of lifetimes is somewhat different from tools in other programming languages,
+    arguably making lifetimes Rust’s most distinctive feature. Although we won’t cover lifetimes in
+    their entirety in this chapter, we’ll discuss common ways you might encounter lifetime syntax
+    so you can become familiar with the concepts.
+    */
 }
