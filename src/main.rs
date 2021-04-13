@@ -3,6 +3,11 @@ mod chapters;
 mod mod_test;
 mod mod_test2;
 mod mod_test3;
+// brings them into scope or you could use package root
+// IE remove the mod scope import
+// then rust_book::mod_name::mod_func_etc
+// mod trial;
+mod trial2;
 
 //pulling mod into scope with use otherwise as described below we must
 //prefix the mod to every call see mod_test3 below
@@ -14,22 +19,26 @@ use mod_test2::test_string as ch2test;
 use chapters::chapter_3::chapter3_1::vars_and_mutability;
 use chapters::chapter_3::{control_flow, data_types, functions};
 use mod_test::mod1::test_string;
+use rust_book::trial::some_included_lib_function;
+use trial2::{another_mod_test, call_it};
 // import all
+use chapters::chapter_10::{
+    traits_defining_shared_behavior, using_generic_data_types, validating_references_with_lifetimes,
+};
 use chapters::chapter_4::*;
 use chapters::chapter_5::{defining_and_init_structs, using_structs_and_method_syntax};
 use chapters::chapter_6::{enum_and_flow_control, enums};
 use chapters::chapter_8::{working_with_hashmap, working_with_vectors};
 use chapters::chapter_9::recoverable_errors_with_result;
-use chapters::chapter_10::{using_generic_data_types
-                           , traits_defining_shared_behavior
- , validating_references_with_lifetimes };
 
 fn main() {
     //http://doc.rust-lang.org/rust-by-example/mod/split.html
     let x: &str = test_string();
     let y: &str = ch2test();
     let z: &str = mod_test3::test_string();
-
+    some_included_lib_function();
+    another_mod_test();
+    call_it();
     println!("{}, {}, {}", x, y, z);
 
     // Chapter 3
@@ -101,7 +110,6 @@ fn main() {
     // If we wanted to read from the backtrace we can setup the cargo command to do
     // RUST_BACKTRACE=1 cargo run
     recoverable_errors_with_result();
-
 
     // Chapter 10
     using_generic_data_types();

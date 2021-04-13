@@ -25,7 +25,6 @@ pub fn using_generic_data_types() {
     //     }
     // }
 
-
     //to this
     // fn largest(list: &[i32]) {
     //     let mut big = &list[0];
@@ -51,12 +50,11 @@ pub fn using_generic_data_types() {
     //     }
     //     largest
     // }
-    let char_list = vec!['d','a','e','f','c'];
+    let char_list = vec!['d', 'a', 'e', 'f', 'c'];
     // let result = largest(&number_list);
     // let result2 = largest(&char_list);
 
     // println!("The first largest => {} and second call largest => {}", result, result2);
-
 
     // Generics In Struct Definitions
     struct Point<T> {
@@ -64,22 +62,20 @@ pub fn using_generic_data_types() {
         y: T,
     }
 
-    let integer = Point {x: 5, y: 10};
-    let float = Point {x: 1.0, y: 4.0};
+    let integer = Point { x: 5, y: 10 };
+    let float = Point { x: 1.0, y: 4.0 };
 
     // Notice the syntax for both functions and struct is similar  in the <T>
 
     // fields x and y are both of the same type thus this would fail
     // let wont_work = Point {x: 1, y: 4.0};
 
-
     // In this case we could define another that takes multiple
     // It's a good sign to restructure if you are using too many
-    struct Point2<T,U> {
+    struct Point2<T, U> {
         x: T,
-        y: U
+        y: U,
     }
-
 
     let both_integer = Point { x: 5, y: 10 };
     let both_float = Point { x: 1.0, y: 4.0 };
@@ -92,9 +88,9 @@ pub fn using_generic_data_types() {
         None,
     }
     // this should make more sense now with std Result
-    enum Result<T,E> {
+    enum Result<T, E> {
         Ok(T),
-        Err(E)
+        Err(E),
     }
 
     // Again the rule of thumb is if the same code is duplicated consider generics.
@@ -103,7 +99,7 @@ pub fn using_generic_data_types() {
 
     struct Point3<T> {
         x: T,
-        y: T
+        y: T,
     }
 
     impl<T> Point3<T> {
@@ -112,7 +108,7 @@ pub fn using_generic_data_types() {
         }
     }
 
-    let p = Point3 { x: 5, y: 10};
+    let p = Point3 { x: 5, y: 10 };
 
     println!("{}", p.x());
 
@@ -135,14 +131,14 @@ pub fn using_generic_data_types() {
 
     struct Point4<T, U> {
         x: T,
-        y: U
+        y: U,
     }
 
-    impl <T, U>  Point4<T,U> {
-       fn mixup<V,W>(self, other: Point4<V,W>) -> Point4<T,W> {
+    impl<T, U> Point4<T, U> {
+        fn mixup<V, W>(self, other: Point4<V, W>) -> Point4<T, W> {
             Point4 {
                 x: self.x,
-                y: other.y
+                y: other.y,
             }
         }
     }
@@ -187,7 +183,6 @@ pub fn using_generic_data_types() {
         None,
     }
      */
-
 }
 
 pub fn traits_defining_shared_behavior() {
@@ -225,14 +220,13 @@ pub fn traits_defining_shared_behavior() {
         fn summarize_default(&self) -> String {
             format!("(Read more {}...)", self.summarize_author())
         }
-
     }
 
     pub struct NewsArticle {
         pub headline: String,
         pub location: String,
         pub author: String,
-        pub content: String
+        pub content: String,
     }
 
     impl Summary for NewsArticle {
@@ -241,7 +235,7 @@ pub fn traits_defining_shared_behavior() {
         }
 
         fn summarize_author(&self) -> String {
-            format!("{}",self.author)
+            format!("{}", self.author)
         }
     }
 
@@ -249,7 +243,7 @@ pub fn traits_defining_shared_behavior() {
         pub username: String,
         pub content: String,
         pub reply: bool,
-        pub retweet: bool
+        pub retweet: bool,
     }
 
     impl Summary for Tweet {
@@ -258,15 +252,13 @@ pub fn traits_defining_shared_behavior() {
         }
 
         fn summarize_author(&self) -> String {
-            format!("{}",self.username)
+            format!("{}", self.username)
         }
     }
 
     let tweet = Tweet {
         username: String::from("horse_ebooks"),
-        content: String::from(
-            "of course, as you probably already know, people",
-        ),
+        content: String::from("of course, as you probably already know, people"),
         reply: false,
         retweet: false,
     };
@@ -277,8 +269,6 @@ pub fn traits_defining_shared_behavior() {
     // type only if either the trait or the type is local to our crate.
 
     // see additional https://doc.rust-lang.org/book/ch10-02-traits.html
-
-
 
     // default implementations
 
@@ -302,7 +292,6 @@ pub fn traits_defining_shared_behavior() {
     // }
     //
     // impl Summary for Whosawhatsit {}
-
 
     //**** TRAITS AS PARAMETERS
     // passing any type that implements Summary trait
@@ -329,19 +318,18 @@ pub fn traits_defining_shared_behavior() {
     // force same type on both
     // pub fn notify<T: Summary>(item1: &T, item2: &T) {}
 
-
     //*** SPECIFYING MULTIPLE TRAIT BOUNDS WITH THE + SYNTAX
 
     /* We can also specify more than one trait bound. Say we wanted notify to use display formatting
-     on item as well as the summarize method: we specify in the notify definition that item must
-     implement both Display and Summary. We can do so using the + syntax:
-     */
+    on item as well as the summarize method: we specify in the notify definition that item must
+    implement both Display and Summary. We can do so using the + syntax:
+    */
 
     // with sugar
     pub fn notify_mult_trait(item: &(impl Summary + Display)) {}
 
     // traitbound
-    pub fn notify_mult_trait_bound_syntax<T:Summary + Display>(item: &T) {}
+    pub fn notify_mult_trait_bound_syntax<T: Summary + Display>(item: &T) {}
 
     //*** Clearer Trait Bound with where Clauses
 
@@ -371,9 +359,7 @@ pub fn traits_defining_shared_behavior() {
     fn returns_summarizable() -> impl Summary {
         Tweet {
             username: String::from("horse_ebooks"),
-            content: String::from(
-                "of course, as you probably already know, people",
-            ),
+            content: String::from("of course, as you probably already know, people"),
             reply: false,
             retweet: false,
         }
@@ -425,9 +411,10 @@ pub fn traits_defining_shared_behavior() {
     behavior in the “Using Trait Objects That Allow for Values of Different Types” section of
     Chapter 17.
     */
-
     // *** Fixing the largest Function with Trait Bounds
-    fn largest<T: PartialOrd + Copy>(list: &[T]) ->  T {
+
+    
+    fn largest<T: PartialOrd + Copy>(list: &[T]) -> T {
         let mut largest = list[0];
 
         for &item in list {
@@ -439,15 +426,15 @@ pub fn traits_defining_shared_behavior() {
         largest
     }
 
-    let number_list = vec![2,32,43,11,23,2];
-    let char_list = vec!['a','z','x','A','d'];
+    let number_list = vec![2, 32, 43, 11, 23, 2];
+    let char_list = vec!['a', 'z', 'x', 'A', 'd'];
 
     let number_result = largest(&number_list);
     let char_result = largest(&char_list);
 
-    println!("The largest in number_list ===> {} and the largest in char is ===> {}",
-        number_result,
-        char_result
+    println!(
+        "The largest in number_list ===> {} and the largest in char is ===> {}",
+        number_result, char_result
     );
 
     struct Pair<T> {
@@ -457,31 +444,30 @@ pub fn traits_defining_shared_behavior() {
 
     // *** Using Trait Bound to Conditionally Implement Methods
 
-
     /* By using a trait bound with an impl block that uses generic type parameters, we can
-       implement methods conditionally for types that implement the specified traits. For example,
-       the type Pair<T> in Listing 10-16 always implements the new function. But Pair<T> only
-       implements the cmp_display method if its inner type T implements the PartialOrd trait that
-       enables comparison and the Display trait that enables printing.
-     */
-    impl <T> Pair<T> {
-        fn new(x:T, y: T ) -> Self {
-            Self { x, y}
+      implement methods conditionally for types that implement the specified traits. For example,
+      the type Pair<T> in Listing 10-16 always implements the new function. But Pair<T> only
+      implements the cmp_display method if its inner type T implements the PartialOrd trait that
+      enables comparison and the Display trait that enables printing.
+    */
+    impl<T> Pair<T> {
+        fn new(x: T, y: T) -> Self {
+            Self { x, y }
         }
     }
 
     impl<T: Display + PartialOrd> Pair<T> {
         fn cmd_display(&self) {
-           if self.x >= self.y {
-               println!("The largest member is x = {}", self.x);
-           } else {
-               println!("The largest member is y = {}", self.y);
-           }
+            if self.x >= self.y {
+                println!("The largest member is x = {}", self.x);
+            } else {
+                println!("The largest member is y = {}", self.y);
+            }
         }
     }
 
-    let x = Pair::new(3,40);
-    let y = Pair::new('s','a');
+    let x = Pair::new(3, 40);
+    let y = Pair::new('s', 'a');
     x.cmd_display();
     y.cmd_display();
 
@@ -502,7 +488,7 @@ pub fn traits_defining_shared_behavior() {
     */
 }
 
-fn validating_references_with_lifetimes() {
+pub fn validating_references_with_lifetimes() {
     /*
     One detail we didn’t discuss in the “References and Borrowing” section in Chapter 4 is that
     every reference in Rust has a lifetime, which is the scope for which that reference is valid.
@@ -517,4 +503,239 @@ fn validating_references_with_lifetimes() {
     their entirety in this chapter, we’ll discuss common ways you might encounter lifetime syntax
     so you can become familiar with the concepts.
     */
+
+    // *** Preventing Dangling References with Lifetimes
+
+    // fn main() {
+    //     {
+    //         let r;                // ---------+-- 'a
+    //                                           |
+    //         {                     //          |
+    //             let x = 5;        // -+-- 'b  |
+    //             r = &x;           //  |       |
+    //         }                     // -+       |
+    //                                           |
+    //         println!("r: {}", r); //          |
+    //     }                         // ---------+
+    // }
+
+    // From the above we can see a lives longer than b so we should get a compiler warning
+
+    // re writing as follows
+    {
+        let x = 5; // ----------+-- 'b
+                   //           |
+        let r = &x; // --+-- 'a  |
+                    //   |       |
+        println!("r: {}", r); //   |       |
+                              // --+       |
+    } // ----------+
+
+    // Not sure on how the scopes are defined 'a or 'b in regards to scope...
+    // The book doesn't make clear the outter scope is xzy and inner scope is zyx
+
+    // *** Generic lifetimes in Functions
+
+    // Currently results in an error due to:
+    // Rust can’t tell whether the reference being returned refers to x or y. Actually, we don’t
+    // know either, because the if block in the body of this function returns a reference to x and
+    // the else block returns a reference to y!
+    // fn longest(x: &str, y: &str) -> &str {
+    //     if x.len() > y.len() {
+    //         x
+    //     } else {
+    //         y
+    //     }
+    // }
+
+    // THE FIX!!!
+    fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+        if x.len() > y.len() {
+            x
+        } else {
+            y
+        }
+    }
+
+    let string1 = String::from("abcd");
+    let string2 = "xyz";
+
+    let result = longest(string1.as_str(), string2);
+    println!("The longest string is {}", result);
+
+    // *** Lifetime Annotation Syntax
+    /*
+    Lifetime annotations don’t change how long any of the references live. Just as functions can
+    accept any type when the signature specifies a generic type parameter, functions can accept
+    references with any lifetime by specifying a generic lifetime parameter. Lifetime annotations
+    describe the relationships of the lifetimes of multiple references to each other without
+    affecting the lifetimes.
+
+    Code style:
+    must start with an apostrophe (') and are usually all lowercase and very short, like generic
+    types. Most people use the name 'a. We place lifetime parameter annotations after the & of a
+    reference, using a space to separate the annotation from the reference’s type.
+
+    &i32        // a reference
+    &'a i32     // a reference with an explicit lifetime
+    &'a mut i32 // a mutable reference with an explicit lifetime
+
+    One lifetime annotation by itself doesn’t have much meaning, because the annotations are
+    meant to tell Rust how generic lifetime parameters of multiple references relate to each other.
+    For example, let’s say we have a function with the parameter first that is a reference to an
+    i32 with lifetime 'a. The function also has another parameter named second that is another
+    reference to an i32 that also has the lifetime 'a. The lifetime annotations indicate that
+    the references first and second must both live as long as that generic lifetime.
+    */
+
+    // Another example
+    let string3 = String::from("long string is long");
+    let result;
+
+    // inner block scope
+    {
+        let string4 = String::from("xyz");
+        result = longest(string3.as_str(), string4.as_str());
+    }
+    // outer scope
+    // this would fail because the values exist at the same level of scope of the func call
+    // and not beyond it.
+    // println!("The longest string is {}", result);
+
+    // *** Thinking in terms of lifetimes.
+    /*
+    The way in which you need to specify lifetime parameters depends on what your function is doing.
+    For example, if we changed the implementation of the longest function to always return the first
+    parameter rather than the longest string slice, we wouldn’t need to specify a lifetime on the y
+    parameter. The following code will compile:
+    */
+    fn longest2<'a>(x: &'a str, y: &str) -> &'a str {
+        x
+    }
+
+    // however this would fail will fail to compile because the return value lifetime is not
+    // related to the lifetime of the parameters; the x param
+    // fn longest2<'a>(x: &'a str, y: &str) -> &'a str {
+    //     let result = String::from("something string");
+    //     result.as_str()
+    // }
+
+    // In this case, the best fix would be to return an owned data type rather than a reference
+    // so the calling function is then responsible for cleaning up the value.
+
+    // *** Lifetime Annotations in Struct Definitions
+
+    struct ImportantExcerpt<'a> {
+        part: &'a str,
+    }
+
+    let novel = String::from("Call me Ishmael. Some years ago...");
+    let first_sentence = novel.split('.').next().expect("Could not find a ','");
+    let i = ImportantExcerpt {
+        part: first_sentence,
+    };
+
+    println!("The part {}", i.part);
+
+    // This annotation means an instance of ImportantExcerpt can’t outlive the reference it holds
+    // in its part field.
+
+    // *** Lifetime Ellision
+    /*
+    You’ve learned that every reference has a lifetime and that you need to specify lifetime
+    parameters for functions or structs that use references. However, in Chapter 4 we had a
+    function in Listing 4-9, which is shown again in Listing 10-26, that compiled without lifetime
+    annotations.
+
+
+    How did this then compile?
+    fn first_word(s: &str) -> &str {
+        let bytes = s.as_bytes();
+
+        for (i, &item) in bytes.iter().enumerate() {
+            if item == b' ' {
+                return &s[0..i];
+            }
+        }
+
+        &s[..]
+    }
+
+    Instead of having a signature of:
+    fn first_word<'a>(s: &'a str) -> &'a str {}
+
+    The Rust team found there were a lot of writing the same annotations in deterministic ways
+    that could be elided
+
+    Lifetimes on function or method parameters are called input lifetimes, and lifetimes on return
+     values are called output lifetimes.
+
+    There are a couple of rules when no lifetimes are defined.
+    1. Each parameter that is a reference gets its own lifetime
+    2. If there is only 1 input lifetime all params get the same output lifetime
+    3. If there are multiple input params but one of them is &self or &mut self
+    the lifetime of self is assigned to all output lifetime parameters.
+    */
+
+    // ***  Lifetime Annotations in Method definitions
+    /*
+    Where we declare and use the lifetime parameters depends on whether they’re related to the
+    struct fields or the method parameters and return values. Lifetime names for struct fields
+    always need to be declared after the impl keyword and then used after the struct’s name,
+    because those lifetimes are part of the struct’s type. In method signatures inside the impl
+    block, references might be tied to the lifetime of references in the struct’s fields, or they
+    might be independent. In addition, the lifetime elision rules often make it so that lifetime
+    annotations aren’t necessary in method signatures. Let’s look at some examples using the struct
+    named ImportantExcerpt that we defined in Listing 10-25.
+     */
+
+    // let's update the original above renamed to keep the other in place
+
+    impl<'a> ImportantExcerpt<'a> {
+        fn level(&self) -> i32 {
+            3
+        }
+        // we’re not required to annotate the lifetime of the reference to self because of the first
+        // elision rule.
+
+        fn announce_and_return_part(&self, announcement: &str) -> &str {
+            println!("Attention please: {}", announcement);
+            self.part
+        }
+        // There are two input lifetimes, so Rust applies the first lifetime elision rule and gives
+        // both &self and announcement their own lifetimes. Then, because one of the parameters is
+        // &self, the return type gets the lifetime of &self, and all lifetimes have been accounted
+        // for
+    }
+
+    // *** The Static Lifetime
+
+    let s: &'static str = "I have a static lifetime.";
+
+    /*
+    You might see suggestions to use the 'static lifetime in error messages. But before specifying
+    'static as the lifetime for a reference, think about whether the reference you have actually
+    lives the entire lifetime of your program or not. You might consider whether you want it to
+    live that long, even if it could. Most of the time, the problem results from attempting to
+    create a dangling reference or a mismatch of the available lifetimes. In such cases, the
+    solution is fixing those problems, not specifying the 'static lifetime.
+    */
+
+    // *** Generic Type Parameters, Trait Bound, and Lifetimes Together
+
+    fn longest_with_an_announcement<'a, T>(x: &'a str, y: &'a str, ann: T) -> &'a str
+    where
+        T: Display,
+    {
+        println!("Announcement! {}", ann);
+        if x.len() > y.len() {
+            x
+        } else {
+            y
+        }
+    };
+
+    let x = longest_with_an_announcement("kasjdfkasjd", "Asdflkjasdlkfj", String::from("SHIIIZ"));
+
+    println!("longest {}", x);
 }

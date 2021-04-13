@@ -411,5 +411,5 @@ pub fn slice_type() {
     // Other slices
     let a: [i64; 5] = [3, 3, 2, 3, 4];
 
-    let sliceA = &a[2..5];
+    let slice_a = &a[2..5];
 }
