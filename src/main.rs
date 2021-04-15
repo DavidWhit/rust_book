@@ -20,7 +20,7 @@ use chapters::chapter_3::chapter3_1::vars_and_mutability;
 use chapters::chapter_3::{control_flow, data_types, functions};
 use mod_test::mod1::test_string;
 use rust_book::trial::some_included_lib_function;
-use trial2::{another_mod_test, call_it};
+use trial2::{another_mod_test, call_it };
 // import all
 use chapters::chapter_10::{
     traits_defining_shared_behavior, using_generic_data_types, validating_references_with_lifetimes,
@@ -115,4 +115,25 @@ fn main() {
     using_generic_data_types();
     traits_defining_shared_behavior();
     validating_references_with_lifetimes();
+
+    // Chapter 11
+    /*
+    The bodies of test functions typically perform these three actions.
+
+    1. Set up any needed data or state
+    2. Run the code you want to test.
+    3. assert the results are what you expect.
+
+    */
+
+    // *** Anatomy of a test function
+    // to change a function into a test function add the #[test] attribute before fn
+    // run with cargo test
+
+
+    // the test module will already be created when creating a lib
+    // IE
+    // cargo new adder --lib
+    // cd adder
+
 }
