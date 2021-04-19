@@ -118,20 +118,21 @@ fn main() {
 
     // Chapter 11
     /*
-    The bodies of test functions typically perform these three actions.
+    See lib.rs
+    The bodies of tests functions typically perform these three actions.
 
     1. Set up any needed data or state
-    2. Run the code you want to test.
+    2. Run the code you want to tests.
     3. assert the results are what you expect.
 
     */
 
-    // *** Anatomy of a test function
-    // to change a function into a test function add the #[test] attribute before fn
-    // run with cargo test
+    // *** Anatomy of a tests function
+    // to change a function into a tests function add the #[tests] attribute before fn
+    // run with cargo tests
 
 
-    // the test module will already be created when creating a lib
+    // the tests module will already be created when creating a lib
     // IE
     // cargo new adder --lib
     // cd adder

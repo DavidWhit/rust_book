@@ -8,16 +8,20 @@ struct Rectangle {
     height: u32
 }
 
+#[allow(dead_code)]
 impl Rectangle {
     fn can_hold(&self, other: &Rectangle) -> bool {
         self.width > other.width && self.height > other.height
     }
 }
 
+#[allow(dead_code)]
 struct Guess {
     value: i32
 }
 
+
+#[allow(dead_code)]
 impl Guess {
     pub fn new(value:i32) -> Guess {
         if value < 1 || value > 100 {
@@ -27,17 +31,31 @@ impl Guess {
     }
 }
 
+
+#[allow(dead_code)]
 fn add_two(a:i32) -> Result< i32,String> {
     Ok(a+2)
 }
 
+#[allow(dead_code)]
 fn greeting(name: &str) -> String {
    format!("Hello! {}", name)
 }
 
+
+pub fn add_two_other(a:i32) -> i32 {
+    internal_adder(a,2)
+}
+
+// This is obviously private
+#[allow(dead_code)]
+fn internal_adder(a:i32, b:i32) -> i32 {
+    a + b
+}
+
 #[cfg(test)]
 mod tests {
-   use super::*; // bring in outer mod scope into inner mod
+   use super::*; // bring in outer mod scope into inner mod allowing private
 
     #[test]
     fn exploration() {
@@ -47,7 +65,7 @@ mod tests {
     fn it_works() {
         assert_eq!(2+2, 4);
     }
-    // #[test]
+    // #[tests]
     // fn hit_the_fan() {
     //     panic!("BLOW IT UP");
     // }
@@ -82,6 +100,7 @@ mod tests {
         )
     }
 
+
     #[test]
     #[should_panic(expected = "Guess values must be between 1 and 100, got 300.")]
     fn greater_than_100() {
@@ -98,7 +117,20 @@ mod tests {
     }
 
     #[test]
-    fn add_to_err() -> Result<i32, String> {
-        Ok(add_two(5)?)
+    // You can also exclude tests with #[ignore]
+    // The use case is they are still tests just those that are time consuming
+    // so you can skip them to run them individually later or otherwise
+    // then run with cargo tests -- --ignored
+    fn add_to_err() -> Result<(), String> {
+        if  add_two(2)? == 4 {
+            Ok(())
+        } else {
+            Err(String::from("Broken"))
+        }
+    }
+
+    #[test]
+    fn internal() {
+        assert_eq!(4, internal_adder(2,2));
     }
 }
