@@ -1,6 +1,12 @@
 // Writing tests
 
-/* *** SEE lib.rs
+/*
+    *** SEE:
+    lib.rs
+    tests
+        /test_integrate_mod
+            /mod.rs
+        /integration_test.rs
 
     use
 

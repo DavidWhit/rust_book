@@ -1,5 +1,6 @@
 pub mod trial;
 pub mod trial2;
+pub mod chapter12_lib;
 
 
 #[derive(Debug)]
@@ -38,7 +39,7 @@ fn add_two(a:i32) -> Result< i32,String> {
 }
 
 #[allow(dead_code)]
-fn greeting(name: &str) -> String {
+pub fn greeting(name: &str) -> String {
    format!("Hello! {}", name)
 }
 
