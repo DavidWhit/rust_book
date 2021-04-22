@@ -69,16 +69,17 @@ pub fn project() {
 
     // here we need to know the ok or err value
     // so we used unwrap_or_else with the closure of the err message.
+
+    // eprintln! prints to stderr
+    // write with run > output.txt
     let config = Config::new(&args).unwrap_or_else(|err| {
-        println!("Problem parsing arguments: {}", err);
+        eprintln!("Problem parsing arguments: {}", err);
         process::exit(1);
     });
 
-    println!("\nSearching for {}", config.query);
-    println!("\nIn file {}\n", config.filename);
     // now we can just use a block on if let
     if let Err(e) = run(config) {
-        println!("Application error: {}", e);
+        eprintln!("Application error: {}", e);
         process::exit(1)
     }
 }
