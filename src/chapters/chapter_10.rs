@@ -456,6 +456,7 @@ pub fn traits_defining_shared_behavior() {
         }
     }
 
+    // only if the type T implements display and PartialOrd otherwise the
     impl<T: Display + PartialOrd> Pair<T> {
         fn cmd_display(&self) {
             if self.x >= self.y {
@@ -735,7 +736,8 @@ pub fn validating_references_with_lifetimes() {
         }
     };
 
-    let x = longest_with_an_announcement("kasjdfkasjd", "Asdflkjasdlkfj", String::from("SHIIIZ"));
+    let x = longest_with_an_announcement("kasjdfkasjd", "Asdflkjasdlkfj",
+                                         String::from("SHIIIZ"));
 
     println!("longest {}", x);
 }

@@ -31,6 +31,8 @@ use chapters::chapter_6::{enum_and_flow_control, enums};
 use chapters::chapter_8::{working_with_hashmap, working_with_vectors};
 use chapters::chapter_9::recoverable_errors_with_result;
 use chapters::chapter_12::project;
+use chapters::chapter_13::closures;
+use crate::chapters::chapter_13::iterators;
 
 fn main() {
     //http://doc.rust-lang.org/rust-by-example/mod/split.html
@@ -138,5 +140,11 @@ fn main() {
     // cargo new adder --lib
     // cd adder
 
+    // Chapter 12 project
     project();
+
+    // Chapter 13
+    closures();
+    iterators();
+
 }
