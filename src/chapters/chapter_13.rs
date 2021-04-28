@@ -198,6 +198,158 @@ pub fn iterators() {
 
     // It also requries you define an Item type and this Item type is used in the return type of
     // the next method. This item type will be the type returned from the iterator
+
+    // *** Methods that produce other iterators
+
+    let v1= vec![1,2,3];
+
+    // this would cause an error because iterators are lazy and do nothing unless consumed
+    // v1.iter().map(|x| x + 1);
+
+    let v2: Vec<i32> = v1.iter().map(|x| x + 1).collect();
+
+    assert_eq!(v2, vec![2,3,4]);
+
+    // *** Comparing Performance: Loops vs Iterators
+
+    // let buffer: &mut [i32];
+    // let coefficients: [i64; 12];
+    // let qlp_shift: i16;
+
+    // The compiler knows by the definition size of 12
+    // it "unrolls" the loop generating repetitive code for optimization
+    // it generates
+    // for i in 12..buffer.len() {
+    //     let prediction = coefficients.iter()
+    //         .zip(&buffer[i-12..i])
+    //         .map(|(&c, &s)| c * s as i64)
+    //         .sum::<i64>() >> qlp_shift;
+    //
+    //     let delta = buffer[i];
+    //     buffer[i] = prediction as i32 + delta;
+    // }
+
+
+
+}
+
+#[derive(PartialEq, Debug)]
+struct Shoe {
+    size: u32,
+    style: String
+}
+
+
+// *** Using Closures that Capture their Environment
+fn shoes_in_my_size(shoes: Vec<Shoe>, shoe_size: u32) -> Vec<Shoe> {
+    shoes.into_iter().filter(|s| s.size == shoe_size).collect()
+}
+
+mod test {
+
+    use super::*;
+
+    #[test]
+    fn filters_by_size() {
+        let shoes = vec![
+            Shoe {
+                size: 10,
+                style: String::from("sneaker"),
+            },
+            Shoe {
+                size: 13,
+                style: String::from("sandal")
+            },
+            Shoe {
+                size: 10,
+                style: String::from("boot")
+            }
+        ];
+
+        let in_my_size = shoes_in_my_size(shoes,10);
+
+        assert_eq!(
+            in_my_size,
+            vec![
+                Shoe {
+                    size: 10,
+                    style: String::from("sneaker")
+                },
+                Shoe {
+                    size: 10,
+                    style: String::from("boot")
+                },
+            ]
+        );
+    }
+
+
+    // *** using other iterator trait methods
+    #[test]
+    fn using_other_iterator_trait_methods() {
+        let sum: u32 = Counter::new()
+            .zip(Counter::new().skip(1))
+            .map(|(a,b)| a * b )
+            .filter(|x| x % 3 == 0)
+            .sum();
+
+        //               0 1 2 3 4 5
+        // zip skip 1    1 2 3 4 5 None (zip is like stacking blocks in a row like a zipper)
+        // map across    0 2 6 12 20  (5 and None doesnt produce)
+        // filter            6 12
+        // sum           18
+
+        assert_eq!(18,sum);
+    }
+
+    #[test]
+    fn calling_next_directly() {
+        let mut counter = Counter::new();
+
+        assert_eq!(counter.next(), Some(1));
+        assert_eq!(counter.next(), Some(2));
+        assert_eq!(counter.next(), Some(3));
+        assert_eq!(counter.next(), Some(4));
+        assert_eq!(counter.next(), Some(5));
+        assert_eq!(counter.next(), None);
+    }
+}
+
+
+// *** Creating Our Own Iterators with the Iterator Trait
+struct Counter {
+    count: u32
+}
+
+impl Counter {
+    fn new() -> Counter {
+        Counter { count: 0 }
+    }
+}
+
+// ANCHOR: here
+impl Iterator for Counter {
+    type Item = u32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.count < 5 {
+            self.count += 1;
+            Some(self.count)
+        } else {
+            None
+        }
+    }
+}
+// ANCHOR: end
+
+// *** Methods that consume the iterator
+#[test]
+fn iterator_sum() {
+    let v1 = vec![1, 2, 3];
+
+    let total : i32 = v1.iter().sum();
+
+    assert_eq!(total, 6);
 }
 
 #[test]

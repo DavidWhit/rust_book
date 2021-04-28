@@ -3,10 +3,12 @@ Putting to use concepts learned in chapters
 7,8,9,10,11
  */
 
+
 use std::env;
 use std::process;
 
-use rust_book::chapter12_lib::{Config, run};
+// use rust_book::chapter12_lib::{Config, run};
+use crate::chapter12_lib::{Config, run};
 
 /*
 The args Function and Invalid Unicode
@@ -65,14 +67,14 @@ fn parse_config(args: &[String]) -> Config {
 
 // pretending this is our main
 pub fn project() {
-    let args: Vec<String> = env::args().collect();
+    // let args: Vec<String> = env::args().collect();
 
     // here we need to know the ok or err value
     // so we used unwrap_or_else with the closure of the err message.
 
     // eprintln! prints to stderr
     // write with run > output.txt
-    let config = Config::new(&args).unwrap_or_else(|err| {
+    let config = Config::new(env::args()).unwrap_or_else(|err| {
         eprintln!("Problem parsing arguments: {}", err);
         process::exit(1);
     });

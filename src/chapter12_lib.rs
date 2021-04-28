@@ -11,15 +11,33 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(args: &[String]) -> Result<Config, &str> {
-        if args.len() < 3 {
-            // panic!("not enough arguments"); changed to Result Return
-            return Err("not enough arguments")
-        }
+    // original 12 signature
+    // pub fn new(args: &[String]) -> Result<Config, &str> {
+    //https://doc.rust-lang.org/book/ch13-03-improving-our-io-project.html
+    // the lifetime elision mention and why static in the result
+    // chp13 fixes
+    pub fn new(mut args: env::Args) -> Result<Config, &'static str> {
+        // if args.len() < 3 {
+        //     // panic!("not enough arguments"); changed to Result Return
+        //     return Err("not enough arguments")
+        // }
+
+        // 13
+        // the binary name
+        args.next();
+
+        // next is the first arg
+        let query = match args.next() {
+           Some(arg) => arg,
+            None => return Err("Didn't get a query string ")
+        };
+
+        let filename = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn't get a file name")
+        };
 
         let case_sensitive = env::var("CASE_INSENSITIVE").is_err();
-        let query = args[1].clone();
-        let filename = args[2].clone();
 
         Ok(Config { query, filename, case_sensitive})
     }
@@ -48,26 +66,35 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>>{
 }
 
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    let mut results = Vec::new();
-    for line in contents.lines() {
-        if line.contains(query) {
-           results.push(line);
-        }
-    }
-
-    results
+    // let mut results = Vec::new();
+    // for line in contents.lines() {
+    //     if line.contains(query) {
+    //        results.push(line);
+    //     }
+    // }
+    // results
+    contents
+        .lines()
+        .filter(|line| line.contains(query))
+        .collect()
 }
 
 pub fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    let mut results = Vec::new();
-    let query = query.to_lowercase();
-    for line in contents.lines() {
-        if line.to_lowercase().contains(&query) {
-            results.push(line);
-        }
-    }
+    // let mut results = Vec::new();
 
-    results
+    // let query = query.to_lowercase();
+    // for line in contents.lines() {
+    //     if line.to_lowercase().contains(&query) {
+    //         results.push(line);
+    //     }
+    // }
+    // results
+
+    // chp 13 updates
+    contents
+        .lines()
+        .filter(|line| line.to_lowercase().contains(&query.to_lowercase()))
+        .collect()
 }
 
 #[cfg(test)]

@@ -1,8 +1,15 @@
+# chapter 14 added more metadata IE license
+# you have to have this if you're publishing
+
 [package]
 name = "rust_book"
 version = "0.1.0"
 authors = ["david"]
 edition = "2018"
+
+# check cargo doc there is a lot of options.
+# MIT OR Apache-2.0 could also be used to support multiple
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

@@ -1,3 +1,11 @@
+/*
+  Even though it seems redundant and works to say mod and then use.
+  to make sure all default modules are included
+  you have to have them in lib.rs
+
+*/
+
+
 // examples of different types of imports
 mod chapters;
 mod mod_test;
@@ -33,6 +41,7 @@ use chapters::chapter_9::recoverable_errors_with_result;
 use chapters::chapter_12::project;
 use chapters::chapter_13::closures;
 use crate::chapters::chapter_13::iterators;
+use chapters::chapter_14::cargo_chapter14;
 
 fn main() {
     //http://doc.rust-lang.org/rust-by-example/mod/split.html
@@ -146,5 +155,8 @@ fn main() {
     // Chapter 13
     closures();
     iterators();
+
+    //Chapter 14
+    cargo_chapter14();
 
 }
