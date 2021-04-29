@@ -4,8 +4,8 @@
 
 pub mod trial;
 pub mod trial2;
-pub mod chapter12_lib;
 pub mod chapters;
+
 
 #[derive(Debug)]
 struct Rectangle {

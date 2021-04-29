@@ -734,7 +734,7 @@ pub fn validating_references_with_lifetimes() {
         } else {
             y
         }
-    };
+    }
 
     let x = longest_with_an_announcement("kasjdfkasjd", "Asdflkjasdlkfj",
                                          String::from("SHIIIZ"));

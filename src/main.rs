@@ -3,11 +3,21 @@
   to make sure all default modules are included
   you have to have them in lib.rs
 
+  Also for them to appear in cargo docs they need to be defined in lib.rs
+  It is also much cleaner to have them all in lib or use workspaces.
 */
+
+// ***************************************************************
+// when you use crate leading keyword that can see any MOD in main and lib
+// files.
+// The binary name root in this case rust_book:: can see any modules outside the main and lib
+// ***************************************************************
 
 
 // examples of different types of imports
-mod chapters;
+// mod chapters;
+
+
 mod mod_test;
 mod mod_test2;
 mod mod_test3;
@@ -24,24 +34,29 @@ use mod_test2::test_string as ch2test;
 // just use the mod or use a part of it use "use" to bring it into scope
 // so that you dont have to lead every call with mod::{some imports}
 // use test3::test_string as ch3test;
-use chapters::chapter_3::chapter3_1::vars_and_mutability;
-use chapters::chapter_3::{control_flow, data_types, functions};
+
+use rust_book::chapters::*;
+
+use chapter_3::chapter3_1::vars_and_mutability;
+use chapter_3::{control_flow, data_types, functions};
 use mod_test::mod1::test_string;
 use rust_book::trial::some_included_lib_function;
 use trial2::{another_mod_test, call_it };
 // import all
-use chapters::chapter_10::{
+use chapter_10::{
     traits_defining_shared_behavior, using_generic_data_types, validating_references_with_lifetimes,
 };
-use chapters::chapter_4::*;
-use chapters::chapter_5::{defining_and_init_structs, using_structs_and_method_syntax};
-use chapters::chapter_6::{enum_and_flow_control, enums};
-use chapters::chapter_8::{working_with_hashmap, working_with_vectors};
-use chapters::chapter_9::recoverable_errors_with_result;
-use chapters::chapter_12::project;
-use chapters::chapter_13::closures;
-use crate::chapters::chapter_13::iterators;
-use chapters::chapter_14::cargo_chapter14;
+use chapter_4::*;
+use chapter_5::{defining_and_init_structs, using_structs_and_method_syntax};
+use chapter_6::{enum_and_flow_control, enums};
+use chapter_8::{working_with_hashmap, working_with_vectors};
+use chapter_9::recoverable_errors_with_result;
+use chapter_12::project;
+use chapter_13::closures;
+// use crate::chapters::chapter_13::iterators;
+use chapter_13::iterators;
+use chapter_14::cargo_chapter14;
+use chapter_15::smart_pointers;
 
 fn main() {
     //http://doc.rust-lang.org/rust-by-example/mod/split.html
@@ -158,5 +173,8 @@ fn main() {
 
     //Chapter 14
     cargo_chapter14();
+
+    //Chapter 15
+    smart_pointers();
 
 }

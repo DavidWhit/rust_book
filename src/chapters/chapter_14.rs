@@ -155,6 +155,16 @@ pub fn cargo_chapter14() {
 
     // crate dependancies are still independant of each other but
     // cargo will manage them so that only 1 is ever downloaded
-    
+
+    // tests work the same from the package lib.rs in question
+
+
+    // *** installing binaries from crates.io with cargo install
+    // Example: cargo install ripgrep
+
+    // Extending Cargo with Customer Commands
+    // Cargo is designed so you can extend it with new subcommands without having to modify
+    // Cargo. If a binary in your $PATH is named cargo-something.
+    // cargo --list
 
 }

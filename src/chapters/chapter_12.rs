@@ -7,8 +7,8 @@ Putting to use concepts learned in chapters
 use std::env;
 use std::process;
 
-// use rust_book::chapter12_lib::{Config, run};
-use crate::chapter12_lib::{Config, run};
+use super::chapter12_lib::{Config, run};
+
 
 /*
 The args Function and Invalid Unicode
