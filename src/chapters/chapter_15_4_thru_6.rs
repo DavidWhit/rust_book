@@ -141,10 +141,15 @@ RefCell<T> allows mutable borrows checked at runtime, you can mutate the value i
 
      let mut x = 5;
     let y = RefCell::new(x);
-    println!("x {} y {}", x, *y.borrow() );
+    println!("x {} y {}", x, y.borrow() );
     *y.borrow_mut() = 122;
 
-    println!("x {} y {}", x, *y.borrow() );
+    println!("x {} y {}", x, y.borrow() );
+
+    // Just jacking around with RefCell to alter an immutable to initialize another immutable
+    let  d = RefCell::new(String::from("kjfaksjdfkjasdfkj"));
+    let e = format!("{} {}", &(d.borrow_mut())[..5], "55555");
+    println!(" d => {} ||******|| e =>  {}", e, d.borrow());
 
     // A Use Case for Interior Mutability: Mock Objects
     // A test double is the general programming concept for a type used in place of another type
