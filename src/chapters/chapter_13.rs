@@ -1,9 +1,8 @@
 // like from js closures or anonymous functions
 // that capture their environment
+use std::io::Chain;
 use std::thread;
 use std::time::Duration;
-use std::io::Chain;
-
 
 // The current cacher has two problems
 // 1 The Cacher instance assumes it will always get the same value for the Parameter
@@ -20,21 +19,21 @@ use std::io::Chain;
 // }
 
 struct Cacher<T>
-    where
-        T: Fn(u32) -> u32, // we know this is a closure because of the Fn trait impl here
+where
+    T: Fn(u32) -> u32, // we know this is a closure because of the Fn trait impl here
 {
-    calculation: T,  // T is the closure with signature defined by trait impl
-value: Option<u32>
+    calculation: T, // T is the closure with signature defined by trait impl
+    value: Option<u32>,
 }
 
 impl<T> Cacher<T>
-    where T: Fn(u32) -> u32,
+where
+    T: Fn(u32) -> u32,
 {
-
     fn new(calculation: T) -> Self {
         Self {
             calculation,
-            value: None
+            value: None,
         }
     }
 
@@ -51,16 +50,16 @@ impl<T> Cacher<T>
 }
 
 pub fn closures() {
-
     // going to create a hypothetical long (ie 3 seconds or so compute time)
     // we dont want to constantly run because we don't want the use waiting more than they should.
     fn simulated_expensive_calculation(intentsity: u32) -> u32 {
         println!("calculating slowly...");
-        thread::sleep(Duration::from_secs(2));
+        // commented out for future runs of chapters
+        // thread::sleep(Duration::from_secs(2));
         intentsity
     }
 
-    fn generate_workout(intensity: u32, random_number:u32) {
+    fn generate_workout(intensity: u32, random_number: u32) {
         // now we call this once not twice in the first if but we call it
         // always regardless in the case of a rnd 3
         // but we now call this everytime we call the function
@@ -68,7 +67,6 @@ pub fn closures() {
 
         // now instead of calling the function before the if logic below we could define
         // a function to store the closure in a variable rather than storing the result
-
 
         // if we had more than one param you separate them out like
         // |num, num1, numN|
@@ -79,7 +77,6 @@ pub fn closures() {
         //     thread::sleep(Duration::from_secs(2));
         //     num
         // };
-
 
         // Common syntax begining with function
         // fn  add_one_v1   (x: u32) -> u32 { x + 1 }
@@ -99,10 +96,10 @@ pub fn closures() {
         // the traits: Fn, FnMut, FnOnce discussed further in "Capturing the Environment with
         // closures"
 
-
         let mut expensive_result = Cacher::new(|num| {
             println!("Calculating slowly...");
-            thread::sleep(Duration::from_secs(2));
+            // commented out for future runs of chapters
+            // thread::sleep(Duration::from_secs(2));
             num
         });
 
@@ -113,12 +110,14 @@ pub fn closures() {
             println!("Next, do {} situps!", expensive_result.value(intensity));
         } else {
             match random_number {
-               3 =>  {
-                println!("Take a break today! Remember to stay hydrated");
-                },
+                3 => {
+                    println!("Take a break today! Remember to stay hydrated");
+                }
                 _ => {
-                    println!("Today, run for {} minutes!"
-                             , expensive_result.value(intensity));
+                    println!(
+                        "Today, run for {} minutes!",
+                        expensive_result.value(intensity)
+                    );
                 }
             }
         }
@@ -129,7 +128,6 @@ pub fn closures() {
         let simulated_random_number = 7;
 
         generate_workout(simulated_user_specified_value, simulated_random_number);
-
     }
 
     // notice that with the closure we only have executed it once
@@ -175,16 +173,16 @@ pub fn closures() {
     // not how it captures them. Move only specifies the latter.
 
     /* Most of the time when specifying one of the Fn trait bounds, you can start with Fn and the
-     compiler will tell you if you need FnMut or FnOnce based on what happens in the closure body.
-     */
+    compiler will tell you if you need FnMut or FnOnce based on what happens in the closure body.
+    */
 }
 
 pub fn iterators() {
-   let v1 = vec![1,2,3];
-   let v1_iter = v1.iter();
-   for val in v1_iter {
-       println!("Got: {}", val);
-   }
+    let v1 = vec![1, 2, 3];
+    let v1_iter = v1.iter();
+    for val in v1_iter {
+        println!("Got: {}", val);
+    }
 
     // iterators implement a trait called Iterator that is defined by the std library as follows
     // pub trait Iterator {
@@ -201,14 +199,14 @@ pub fn iterators() {
 
     // *** Methods that produce other iterators
 
-    let v1= vec![1,2,3];
+    let v1 = vec![1, 2, 3];
 
     // this would cause an error because iterators are lazy and do nothing unless consumed
     // v1.iter().map(|x| x + 1);
 
     let v2: Vec<i32> = v1.iter().map(|x| x + 1).collect();
 
-    assert_eq!(v2, vec![2,3,4]);
+    assert_eq!(v2, vec![2, 3, 4]);
 
     // *** Comparing Performance: Loops vs Iterators
 
@@ -228,17 +226,13 @@ pub fn iterators() {
     //     let delta = buffer[i];
     //     buffer[i] = prediction as i32 + delta;
     // }
-
-
-
 }
 
 #[derive(PartialEq, Debug)]
 struct Shoe {
     size: u32,
-    style: String
+    style: String,
 }
-
 
 // *** Using Closures that Capture their Environment
 fn shoes_in_my_size(shoes: Vec<Shoe>, shoe_size: u32) -> Vec<Shoe> {
@@ -258,15 +252,15 @@ mod test {
             },
             Shoe {
                 size: 13,
-                style: String::from("sandal")
+                style: String::from("sandal"),
             },
             Shoe {
                 size: 10,
-                style: String::from("boot")
-            }
+                style: String::from("boot"),
+            },
         ];
 
-        let in_my_size = shoes_in_my_size(shoes,10);
+        let in_my_size = shoes_in_my_size(shoes, 10);
 
         assert_eq!(
             in_my_size,
@@ -283,13 +277,12 @@ mod test {
         );
     }
 
-
     // *** using other iterator trait methods
     #[test]
     fn using_other_iterator_trait_methods() {
         let sum: u32 = Counter::new()
             .zip(Counter::new().skip(1))
-            .map(|(a,b)| a * b )
+            .map(|(a, b)| a * b)
             .filter(|x| x % 3 == 0)
             .sum();
 
@@ -299,7 +292,7 @@ mod test {
         // filter            6 12
         // sum           18
 
-        assert_eq!(18,sum);
+        assert_eq!(18, sum);
     }
 
     #[test]
@@ -315,10 +308,9 @@ mod test {
     }
 }
 
-
 // *** Creating Our Own Iterators with the Iterator Trait
 struct Counter {
-    count: u32
+    count: u32,
 }
 
 impl Counter {
@@ -347,14 +339,14 @@ impl Iterator for Counter {
 fn iterator_sum() {
     let v1 = vec![1, 2, 3];
 
-    let total : i32 = v1.iter().sum();
+    let total: i32 = v1.iter().sum();
 
     assert_eq!(total, 6);
 }
 
 #[test]
 fn iterator_demo() {
-    let v1 = vec![1,2,3];
+    let v1 = vec![1, 2, 3];
 
     let mut v1_iter = v1.iter();
 

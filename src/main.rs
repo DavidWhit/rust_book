@@ -13,10 +13,8 @@
 // The binary name root in this case rust_book:: can see any modules outside the main and lib
 // ***************************************************************
 
-
 // examples of different types of imports
 // mod chapters;
-
 
 mod mod_test;
 mod mod_test2;
@@ -41,22 +39,24 @@ use chapter_3::chapter3_1::vars_and_mutability;
 use chapter_3::{control_flow, data_types, functions};
 use mod_test::mod1::test_string;
 use rust_book::trial::some_included_lib_function;
-use trial2::{another_mod_test, call_it };
+use trial2::{another_mod_test, call_it};
 // import all
 use chapter_10::{
     traits_defining_shared_behavior, using_generic_data_types, validating_references_with_lifetimes,
 };
+use chapter_12::project;
+use chapter_13::closures;
 use chapter_4::*;
 use chapter_5::{defining_and_init_structs, using_structs_and_method_syntax};
 use chapter_6::{enum_and_flow_control, enums};
 use chapter_8::{working_with_hashmap, working_with_vectors};
 use chapter_9::recoverable_errors_with_result;
-use chapter_12::project;
-use chapter_13::closures;
 // use crate::chapters::chapter_13::iterators;
 use chapter_13::iterators;
 use chapter_14::cargo_chapter14;
-use chapter_15::smart_pointers;
+use chapter_15::{
+    running_code_on_cleanup_with_drop_trait, smart_pointers, treating_sp_as_reg_refs_with_deref,
+};
 
 fn main() {
     //http://doc.rust-lang.org/rust-by-example/mod/split.html
@@ -158,7 +158,6 @@ fn main() {
     // to change a function into a tests function add the #[tests] attribute before fn
     // run with cargo tests
 
-
     // the tests module will already be created when creating a lib
     // IE
     // cargo new adder --lib
@@ -176,5 +175,6 @@ fn main() {
 
     //Chapter 15
     smart_pointers();
-
+    treating_sp_as_reg_refs_with_deref();
+    running_code_on_cleanup_with_drop_trait();
 }
