@@ -55,8 +55,8 @@ use chapter_12::project;
 use chapter_13::closures;
 // use crate::chapters::chapter_13::iterators;
 use chapter_13::iterators;
-use chapter_14::cargo_chapter14;
 use chapter_15::smart_pointers;
+use chapter_15_4_thru_6::{reference_count_smart_pointer, interior_mutability_pattern};
 
 fn main() {
     //http://doc.rust-lang.org/rust-by-example/mod/split.html
@@ -172,9 +172,10 @@ fn main() {
     iterators();
 
     //Chapter 14
-    cargo_chapter14();
+    // changed to a mod just read
 
     //Chapter 15
     smart_pointers();
-
+    reference_count_smart_pointer();
+    interior_mutability_pattern();
 }
