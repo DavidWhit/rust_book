@@ -42,7 +42,7 @@ use std::env;
         }
     }
 
-    // Extracting Logic from main
+// Extracting Logic from main
 // Returning errors from the run function
 // trait object Box<dyn Error>  means the function will return a type that implements
 // the Error trait also that we imported use std::error::Error
