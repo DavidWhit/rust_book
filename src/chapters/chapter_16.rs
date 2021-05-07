@@ -1,3 +1,9 @@
+
+use std::thread;
+use std::time::Duration;
+use std::sync::mpsc;
+use std::sync::Mutex;
+
 pub fn fearless_concurrency() {
     /*
     I already know this but recapping:
@@ -66,8 +72,6 @@ pub fn fearless_concurrency() {
       For aspects such as more control over which threads run when and lower costs of context switching,
     */
 
-    use std::thread;
-    use std::time::Duration;
 
     let handle = thread::spawn(|| {
         for i in 1..10 {
@@ -141,6 +145,115 @@ pub fn using_msg_passing_to_trns_data_btwn_threads() {
     The reciever half is downstream  receiving 
     The channel is closed if either the transmitter or receiver half is dropped.
 
-    The example will create a 
+    The example will create a program that has one thread to generate values and send them 
+    down a channel and thread that will receive the values and print them out. 
+
+    We'll be sending simple values between threads using a channels 
     */
+
+    // mpsc == multi producer single consumer
+    // returns a tuple transmitter, receiver
+    let (tx, rx) = mpsc::channel();
+
+    thread::spawn(move || {
+        let val = String::from("hi");
+        tx.send(val).unwrap(); // closure has ownership of tx via move and then send takes ownership
+        // println!("Got: {}", val);  val is no longer available
+    });
+
+    let received = rx.recv().unwrap(); // rx.recv blocks the main thread and returns Result<T,E>
+    // try_recv is useful if the thread has other work to do while waiting for messages
+    println!("Got: {}", received);
+
+    //***  Channels and Ownership Transference
+    // make two producers
+    let (tx, rx) = mpsc::channel();
+    let tx_clone = tx.clone();
+
+    thread::spawn(move || {
+        let vals = vec![
+            String::from("hi"),
+            String::from("from"),
+            String::from("the"),
+            String::from("thread")
+        ];
+
+        for val in vals {
+            tx.send(val).unwrap();
+            thread::sleep(Duration::from_secs(1));
+        }
+    });
+
+    thread::spawn(move || {
+        let vals = vec![
+            String::from("more"),
+            String::from("messages"),
+            String::from("for"),
+            String::from("you")
+        ];
+
+        for val in vals {
+            tx_clone.send(val).unwrap();
+            thread::sleep(Duration::from_secs(1));
+        }
+    });
+
+
+    // The sends from above are going to make 
+    // again the main thread is blocked until all messages are received
+    for received in rx {
+        println!("Got: {}", received);
+    }
+
+
+    /* *** Shared-State Concurrency
+    msg passing is a fine way handling concurrency but its not the only one
+
+    what would communicating by sharing memory look like?
+
+    channels in any programming language are similar to single ownership, because once
+    you transfer a value down a channel you should no longer use that value.
+    shared memory is having multiple ownership where mult threads can access the same 
+    memory location this is more difficult because multiple owners need managing
+    Rusts ownership and rules greatly assit in getting this management correct.
+
+
+    *** Using Mutexes to Allow Access to Data from One Thread at a Time
+
+    Mutex is an abbreviation for mutual exclusion it only allows one thread to access
+    some data at any given time. To access teh data in a mutex a thread must first signal
+    that it wants access by asking to aquire the mutex lock. The lock is a data structure
+    that is part of the mutex that keeps track of who currently has exclusive access to the
+    data. Therefore, the mutex is described as guarding the data it holds via the locking
+    system.
+
+    Mutexes have a reputation for being difficult to use because you have to remember two rules:
+    1. You have to attempt to acquire the lock before using the data
+    2. When you're done with the data the mutex guards you must unlock the data so other
+        threads can acquire it.
+
+    Management of mutexes can be incredibly tricky to get right which is why so many people
+    are proponents of channels. However, thanks to Rust you can't get locking and unlocking
+    wrong.
+
+
+    *** The API of Mutex<T>
+
+    */
+
+    // First lets use a mutex in a single thread context
+    // Mut<T> is a smart pointer
+    let m = Mutex::new(5);
+
+    {
+        // lock will block the current thread (this case main)
+        // the call to lock would fail if another thread holding the lock panicked
+        // the call to lock returns a type MutexGuard
+        // it implements Deref, Drop to point to the inner data 
+        let mut num = m.lock().unwrap();
+        *num = 6;
+    }
+
+    println!("m = {:?}", m);
+
 }
