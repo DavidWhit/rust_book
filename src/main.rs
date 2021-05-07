@@ -54,9 +54,20 @@ use chapter_9::recoverable_errors_with_result;
 // use crate::chapters::chapter_13::iterators;
 use chapter_13::iterators;
 use chapter_14::cargo_chapter14;
+use chapter_15::smart_pointers;
 use chapter_15::{
     running_code_on_cleanup_with_drop_trait, smart_pointers, treating_sp_as_reg_refs_with_deref,
 };
+use chapter_15_4_thru_6::{
+    interior_mutability_pattern, reference_count_smart_pointer, reference_cycles_can_leak,
+};
+use chapter_16::fearless_concurrency;
+
+fn block_print_chap(title: &str, chapter: &str) {
+    println!("\n*****************************************************************************");
+    println!("CHAPTER {} \n{}", chapter, title);
+    println!("*****************************************************************************\n");
+}
 
 fn main() {
     //http://doc.rust-lang.org/rust-by-example/mod/split.html
@@ -69,21 +80,25 @@ fn main() {
     println!("{}, {}, {}", x, y, z);
 
     // Chapter 3
+    block_print_chap("Common Programming Concepts", "3");
     vars_and_mutability();
     data_types();
     functions();
     control_flow();
 
-    // Chatper 4
+    // Chapter 4
+    block_print_chap("Understanding Ownership", "4");
     ownership();
     references_and_borrowing();
     slice_type();
 
     // Chapter 5
+    block_print_chap("Using Structs to Structure Related Date", "5");
     defining_and_init_structs();
     using_structs_and_method_syntax();
 
     // Chapter 6
+    block_print_chap("Enums and Pattern Matching", "6");
     enums();
     enum_and_flow_control();
 
@@ -112,10 +127,12 @@ fn main() {
     // continued in restaurant project chapter 7 modules lib
 
     // CHAPTER 8
+    block_print_chap("Enums and Pattern Matching", "8");
     working_with_vectors();
     working_with_hashmap();
 
     // CHAPTER 9 ERROR Handling
+    block_print_chap("Error handling", "9");
     // panic! macro
 
     // By default the panic! macro will undwind the stack walking back up the stack
@@ -139,6 +156,7 @@ fn main() {
     recoverable_errors_with_result();
 
     // Chapter 10
+    block_print_chap("Generic Types, Traits, and Lifetimes", "10");
     using_generic_data_types();
     traits_defining_shared_behavior();
     validating_references_with_lifetimes();
@@ -164,17 +182,27 @@ fn main() {
     // cd adder
 
     // Chapter 12 project
+    block_print_chap("An I/O Project: Building a Command Line Program", "12");
     project();
 
     // Chapter 13
+    block_print_chap("Functional Language Features: Iterators and Closures", "13");
     closures();
     iterators();
 
     //Chapter 14
-    cargo_chapter14();
+    // changed to a mod just read
 
     //Chapter 15
+    block_print_chap("Smart Pointers", "15");
     smart_pointers();
     treating_sp_as_reg_refs_with_deref();
     running_code_on_cleanup_with_drop_trait();
+    reference_count_smart_pointer();
+    interior_mutability_pattern();
+    reference_cycles_can_leak();
+
+    //Chapter 16
+    block_print_chap("Fearless Concurrency", "16");
+    fearless_concurrency();
 }

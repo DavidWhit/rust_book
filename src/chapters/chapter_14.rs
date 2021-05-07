@@ -4,7 +4,7 @@
 //! calculations more convenient.
 
 /// Adds one to the number given.
-pub fn cargo_chapter14() {
+pub mod cargo_chapter14 {
 
     // cargo has two main profiles are predefined and customizable
 
@@ -39,7 +39,7 @@ pub fn cargo_chapter14() {
     /// # Examples
     /// ```
     /// let arg = 5;
-    /// let answer = my_crate::add_one(arg);
+    /// let answer = rust_book::chapters::chapter_14::add_one(arg);
     ///
     /// assert_eq!(6, answer);
     /// ```
