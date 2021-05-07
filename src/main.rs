@@ -53,8 +53,7 @@ use chapter_8::{working_with_hashmap, working_with_vectors};
 use chapter_9::recoverable_errors_with_result;
 // use crate::chapters::chapter_13::iterators;
 use chapter_13::iterators;
-use chapter_14::cargo_chapter14;
-use chapter_15::smart_pointers;
+// use chapter_14::cargo_chapter14;
 use chapter_15::{
     running_code_on_cleanup_with_drop_trait, smart_pointers, treating_sp_as_reg_refs_with_deref,
 };
