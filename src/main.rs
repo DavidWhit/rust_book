@@ -53,15 +53,16 @@ use chapter_8::{working_with_hashmap, working_with_vectors};
 use chapter_9::recoverable_errors_with_result;
 // use crate::chapters::chapter_13::iterators;
 use chapter_13::iterators;
-use chapter_14::cargo_chapter14;
-use chapter_15::smart_pointers;
+// use chapter_14::cargo_chapter14;
 use chapter_15::{
     running_code_on_cleanup_with_drop_trait, smart_pointers, treating_sp_as_reg_refs_with_deref,
 };
 use chapter_15_4_thru_6::{
     interior_mutability_pattern, reference_count_smart_pointer, reference_cycles_can_leak,
 };
-use chapter_16::fearless_concurrency;
+use chapter_16::{fearless_concurrency, using_msg_passing_to_trns_data_btwn_threads};
+use chapter_17::{characteristics_of_oop, encoding_states_and_behavior_as_types};
+use chapter_18::{patterns_and_matching};
 
 fn block_print_chap(title: &str, chapter: &str) {
     println!("\n*****************************************************************************");
@@ -205,4 +206,15 @@ fn main() {
     //Chapter 16
     block_print_chap("Fearless Concurrency", "16");
     fearless_concurrency();
+    using_msg_passing_to_trns_data_btwn_threads();
+    
+    //Chapter 17
+    block_print_chap("OOP Features of Rust", "17");
+    characteristics_of_oop();
+    encoding_states_and_behavior_as_types();
+
+    //Chapter 18
+    block_print_chap("Patterns and Matching", "18");
+    patterns_and_matching();
+
 }
