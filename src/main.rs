@@ -217,4 +217,7 @@ fn main() {
     block_print_chap("Patterns and Matching", "18");
     patterns_and_matching();
 
+    //Chapter 19
+    block_print_chap("Advanced Features", "19");
+    
 }

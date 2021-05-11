@@ -113,5 +113,203 @@ pub fn patterns_and_matching() {
      refutable
      and irrefutable
 
+     let x = 5  because x matches anything therefore cannot fail to match
+     Patterns that can fail to match for some possible value are refutable. 
+     An example would be Some(x) if None it will fail
+
+     you could do if let x = 5 but the compiler will tell you that's dumb
+
+    */
+
+    // matching named variables
+
+    let x = Some(5); 
+    let y = 10;
+
+    match x {
+        Some(50) => println!("Got 50"),
+        Some(y) => println!("Matched, y = {:?}", y), 
+        // we created and used y in scope (shadowing the outer scope) so in this case y is 5
+        _ => println!("Default case, x = {:?}", x),
+    }
+
+    // multiple patterns
+
+    let x = 1;
+
+    match x {
+        1 | 2 => println!("one or two"),
+        _ => println!("anything else") 
+    }
+
+    // matching ranges
+
+    let x = 5;
+
+    match x {
+        1..=5 => println!("one through five"),
+        _ => println!("something else")
+    }
+
+    let x = 'c';
+
+    match x {
+        'a'..='j' => println!("a through j"),
+         _ => println!("something else")
+    }
+
+
+    // Destructuring Structs 
+
+    struct Point {
+        x: i32, 
+        y: i32, 
+    }
+
+    let p = Point {x: 0, y: 7};
+    let Point { x: _, y: b} = p;
+    // assert_eq!(0,a); 
+    assert_eq!(7,b); 
+
+    // Destructuring Enums
+
+    enum Message {
+        Quit, 
+        Move { x:i32, y:i32},
+        Write(String),
+        ChangeColor(Color)
+    }
+
+    let msg = Message::ChangeColor(Color::Rgb(0,160,255));
+
+    let move_message = Message::Move { x: 4 , y: 32};
+
+    // You can't do this
+    // let requires a irrefutable pattern
+    // let Message::Move { x: a, y: b} = move_message;
+
+
+    match msg {
+        Message::ChangeColor(Color::Rgb(r,g,b)) => println!("values {} {} {}", r,g,b), 
+        // do similiar things for the others 
+        // Message::Move { x, y }  => 
+        // Message::Quit => 
+        // Message::Write (text) =>
+        _ => println!("something else")
+    }
+
+    // Destructing nested Enums
+
+    enum Color {
+        Rgb( i32, i32, i32),
+        Hsv( i32,i32,i32)
+    }
+    // with above message changed Color to new enum above
+    // check the new match
+
+
+    // Destructing Structs and Tuples
+    let ((feet,inches), Point {x, y}) = ((3,10), Point { x:3, y:-10});
+
+    println!("{} {} {} {}", feet, inches, x, y);
+
+    // Ignore pattern with _ 
+    // or unused with _x    *** THIS STILL BINDS *** where _ doesn't
+
+    let _x = 6; // binds
+
+    let s = Some(String::from("tst"));
+    if let Some(_s) = s {
+        println!("found string");
+    }
+      
+    // This would error because it's moved by the bind  Some(_s) = s
+    // println!("{:?}", s);
+
+    let numbers = (2,4,8,16,32);
+
+    match numbers {
+        (first, _ , third,_, fifth) => println!("Some numbers: {} {} {} ", first, third, fifth)
+    }
+
+
+    // Ignoring multiple with ..
+
+    struct Point2 {
+        x: i32,
+        y: i32,
+        z: i32
+    }
+
+    let origin = Point2 {x: 0, y: 0, z:0};
+
+    match origin {
+        Point2 { x, ..} => println!("x is {}", x)
+    }
+
+    let numbers = (2, 4, 8, 16, 32);
+
+    // Can only be used once in a pattern
+    match numbers {
+        (first, .., last) => println!("Some numbers: {}, {}", first, last)
+        // Can only be used once in a pattern this would fail
+        // 
+        // (.., second, ..) => println!("Some numbers: {}", second)
+    }
+
+    // Extra Conditionals with Match Guards
+
+    let num = Some(4);
+    let y = 20;
+
+    match num {
+        // you can check against vals created out of the match scope
+        // we just can't use  
+        Some(x) if x < y => println!("less than {}: {}",y, x),
+        Some(x) => println!("{}", x), 
+        None => (),
+    }
+
+    let x = 4;
+    let y = false;
+
+    match x {
+        // precedence (4|5|6) first then if 
+        4 | 5| 6 if y => println!("yes"),
+        _ => println!("no")
+    }
+
+
+    // @ bindings
+
     /*
+        The @ operator lets us create a variable that holds a value at the same 
+        time we're testing that value to see if it matches a pattern.
+
+        IE we want to test that a Message:Hello id field is with the range 3..=7
+        but we also want to bind the value to the variable id_variable so we can use it in 
+        code associated to the arm. we could name this variable id, the same as the field, but for this exmaple
+        we'll use a different name.
+
+    */
+
+    enum Message2 {
+        Hello {id: i32}
+    }
+
+    let msg = Message2::Hello {id: 5};
+
+
+    // basically you can bind the variable that's within the range 
+    // without knowing what it was other than it matched and we get the value
+    // that was in range back
+    match msg {
+        Message2::Hello {
+            id: id_variable @ 3..=7, 
+        } => println!("Found an id in range: {}", id_variable),
+        Message2::Hello {id: 10..=12} => println!("Found in another range"),
+        Message2::Hello {id } => println!("Found some other id: {}", id),
+    }
+
+
 }
