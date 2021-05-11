@@ -180,7 +180,7 @@ pub fn using_msg_passing_to_trns_data_btwn_threads() {
 
         for val in vals {
             tx.send(val).unwrap();
-            thread::sleep(Duration::from_secs(1));
+            // thread::sleep(Duration::from_secs(1));
         }
     });
 
@@ -194,7 +194,7 @@ pub fn using_msg_passing_to_trns_data_btwn_threads() {
 
         for val in vals {
             tx_clone.send(val).unwrap();
-            thread::sleep(Duration::from_secs(1));
+            // thread::sleep(Duration::from_secs(1));
         }
     });
 
@@ -246,13 +246,13 @@ pub fn using_msg_passing_to_trns_data_btwn_threads() {
     let m = Mutex::new(5);
 
     {
-        // lock will block the current thread (this case main)
+        // lock will block the current thread (this case the main thread)
         // the call to lock would fail if another thread holding the lock panicked
         // the call to lock returns a type MutexGuard
         // it implements Deref, Drop to point to the inner data 
         let mut num = m.lock().unwrap();
         *num = 6;
-    }
+    }// lock is dropped after scope
 
     println!("m = {:?}", m);
 

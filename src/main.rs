@@ -60,7 +60,9 @@ use chapter_15::{
 use chapter_15_4_thru_6::{
     interior_mutability_pattern, reference_count_smart_pointer, reference_cycles_can_leak,
 };
-use chapter_16::fearless_concurrency;
+use chapter_16::{fearless_concurrency, using_msg_passing_to_trns_data_btwn_threads};
+use chapter_17::{characteristics_of_oop, encoding_states_and_behavior_as_types};
+use chapter_18::{patterns_and_matching};
 
 fn block_print_chap(title: &str, chapter: &str) {
     println!("\n*****************************************************************************");
@@ -204,4 +206,18 @@ fn main() {
     //Chapter 16
     block_print_chap("Fearless Concurrency", "16");
     fearless_concurrency();
+    using_msg_passing_to_trns_data_btwn_threads();
+    
+    //Chapter 17
+    block_print_chap("OOP Features of Rust", "17");
+    characteristics_of_oop();
+    encoding_states_and_behavior_as_types();
+
+    //Chapter 18
+    block_print_chap("Patterns and Matching", "18");
+    patterns_and_matching();
+
+    //Chapter 19
+    block_print_chap("Advanced Features", "19");
+    
 }
