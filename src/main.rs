@@ -1,59 +1,81 @@
 /*
-  Even though it seems redundant and works to say mod and then use.
-  to make sure all default modules are included
-  you have to have them in lib.rs
 
-  Also for them to appear in cargo docs they need to be defined in lib.rs
+  http://doc.rust-lang.org/rust-by-example/mod/split.html
+
+  *** For mods to appear in cargo docs they need to be defined in lib.rs ***
   It is also much cleaner to have them all in lib or use workspaces.
-*/
 
 // ***************************************************************
 // when you use crate leading keyword that can see any MOD in main and lib
 // files.
 // The binary name root in this case rust_book:: can see any modules outside the main and lib
+// This effects what cargo doc will show as well
 // ***************************************************************
 
-// examples of different types of imports
-// mod chapters;
+examples of different types of imports
+mod chapters;
 
-mod mod_test;
-mod mod_test2;
-mod mod_test3;
-// brings them into scope or you could use package root
-// IE remove the mod scope import
-// then rust_book::mod_name::mod_func_etc
-// mod trial;
-mod trial2;
+A path can take two forms:
+1.An absolute path starts from a crate root by using a crate name or a literal crate.
+2.A relative path starts from the current module and uses self, super, or an identifier in
+    the current module.
 
-//pulling mod into scope with use otherwise as described below we must
-//prefix the mod to every call see mod_test3 below
+-- I feel like you can do this in one of two ways that make sense.
+   1. If making a lib and add all mods you intend to import to it.
+   2. Just for code splitting in main use mod mod_name then nest or expand just like lib
+      similar to trial2
+
+this will pull in files or mod.rs under the directory matching the name
+ */
+mod mod_test; //src dir file points to mod1 matching the name *** This shouldn't be common ***
+mod mod_test2; // directory matching name with mod.rs
+mod mod_test3; // directory matching name with mod.rs that points to inner mod
+mod async_rust; // directory matching name with mod.rs
+
+/*
+ If the module is defined in lib then you can use cargo toml package_name to import directly:
+ IE -- rust_book::mod_name::mod_func_etc
+
+ This one isn't necessary because we can import directly with use because it exists in lib.
+ mod trial2;
+*/
+
+/*
+ *** note I couldn't say rust_book::mod_test3 because it's not in main or lib
+     thus I had to declare the mod for scope above and then use it.
+
+     For all mod tests you could just say mod and then prefix everything
+     but for most cases you would have several imports so to avoid all the prefixes use what
+     you are going to.
+ */
+use mod_test::mod1::test_string;
+use mod_test3::blah::blah;
 // import as alias
 use mod_test2::test_string as ch2test;
-// just use the mod or use a part of it use "use" to bring it into scope
-// so that you dont have to lead every call with mod::{some imports}
-// use test3::test_string as ch3test;
+// additional learning https://rust-lang.github.io/async-book/01_getting_started/02_why_async.html
+use async_rust::std_async_rust;
 
+// all rust_book mods exists in lib
+use rust_book::trial::some_included_lib_function;
+use rust_book::trial2::{another_mod_test, call_it};
+use rust_book::trial2::chapters::chapters_9::nesting_mods;
+// import all from chapters mod
 use rust_book::chapters::*;
 
 use chapter_3::chapter3_1::vars_and_mutability;
 use chapter_3::{control_flow, data_types, functions};
-use mod_test::mod1::test_string;
-use rust_book::trial::some_included_lib_function;
-use trial2::{another_mod_test, call_it};
-// import all
-use chapter_10::{
-    traits_defining_shared_behavior, using_generic_data_types, validating_references_with_lifetimes,
-};
-use chapter_12::project;
-use chapter_13::closures;
 use chapter_4::*;
 use chapter_5::{defining_and_init_structs, using_structs_and_method_syntax};
 use chapter_6::{enum_and_flow_control, enums};
 use chapter_8::{working_with_hashmap, working_with_vectors};
 use chapter_9::recoverable_errors_with_result;
-// use crate::chapters::chapter_13::iterators;
-use chapter_13::iterators;
-// use chapter_14::cargo_chapter14;
+use chapter_10::{
+    traits_defining_shared_behavior, using_generic_data_types, validating_references_with_lifetimes,
+};
+// Chapter 11 is all included in lib.rs
+use chapter_12::project;
+use chapter_13::{closures, iterators};
+// 14 was read only
 use chapter_15::{
     running_code_on_cleanup_with_drop_trait, smart_pointers, treating_sp_as_reg_refs_with_deref,
 };
@@ -64,6 +86,7 @@ use chapter_16::{fearless_concurrency, using_msg_passing_to_trns_data_btwn_threa
 use chapter_17::{characteristics_of_oop, encoding_states_and_behavior_as_types};
 use chapter_18::{patterns_and_matching};
 
+
 fn block_print_chap(title: &str, chapter: &str) {
     println!("\n*****************************************************************************");
     println!("CHAPTER {} \n{}", chapter, title);
@@ -71,14 +94,12 @@ fn block_print_chap(title: &str, chapter: &str) {
 }
 
 fn main() {
-    //http://doc.rust-lang.org/rust-by-example/mod/split.html
     let x: &str = test_string();
     let y: &str = ch2test();
-    let z: &str = mod_test3::test_string();
     some_included_lib_function();
     another_mod_test();
     call_it();
-    println!("{}, {}, {}", x, y, z);
+    println!("{}, {}", x, y);
 
     // Chapter 3
     block_print_chap("Common Programming Concepts", "3");
@@ -219,5 +240,7 @@ fn main() {
 
     //Chapter 19
     block_print_chap("Advanced Features", "19");
+
+    std_async_rust();
     
 }

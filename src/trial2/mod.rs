@@ -1,4 +1,4 @@
-mod chapters;
+pub mod chapters;
 
 pub fn another_mod_test() {
     println!("You are now using another module!");
