@@ -21,15 +21,18 @@ A path can take two forms:
     the current module.
 
 -- I feel like you can do this in one of two ways that make sense.
-   1. If making a lib and add all mods you intend to import to it.
+   1. If making a lib add all mods you intend to import to it.
    2. Just for code splitting in main use mod mod_name then nest or expand just like lib
       similar to trial2
 
 this will pull in files or mod.rs under the directory matching the name
  */
-mod mod_test; //src dir file points to mod1 matching the name *** This shouldn't be common ***
-mod mod_test2; // directory matching name with mod.rs
-mod mod_test3; // directory matching name with mod.rs that points to inner mod
+mod mod_test;
+//src dir file points to mod1 matching the name *** This shouldn't be common ***
+mod mod_test2;
+// directory matching name with mod.rs
+mod mod_test3;
+// directory matching name with mod.rs that points to inner mod
 mod async_rust; // directory matching name with mod.rs
 
 /*
@@ -53,7 +56,7 @@ use mod_test3::blah::blah;
 // import as alias
 use mod_test2::test_string as ch2test;
 // additional learning https://rust-lang.github.io/async-book/01_getting_started/02_why_async.html
-use async_rust::std_async_rust;
+use async_rust::chapter_1::chp_1_3_async_await_primer;
 
 // all rust_book mods exists in lib
 use rust_book::trial::some_included_lib_function;
@@ -85,6 +88,7 @@ use chapter_15_4_thru_6::{
 use chapter_16::{fearless_concurrency, using_msg_passing_to_trns_data_btwn_threads};
 use chapter_17::{characteristics_of_oop, encoding_states_and_behavior_as_types};
 use chapter_18::{patterns_and_matching};
+use chapter_19::advanced_features;
 
 
 fn block_print_chap(title: &str, chapter: &str) {
@@ -228,7 +232,7 @@ fn main() {
     block_print_chap("Fearless Concurrency", "16");
     fearless_concurrency();
     using_msg_passing_to_trns_data_btwn_threads();
-    
+
     //Chapter 17
     block_print_chap("OOP Features of Rust", "17");
     characteristics_of_oop();
@@ -240,7 +244,71 @@ fn main() {
 
     //Chapter 19
     block_print_chap("Advanced Features", "19");
+    advanced_features();
 
-    std_async_rust();
-    
+    // Async Primer
+    chp_1_3_async_await_primer();
+
+
+    // COW smart pointer
+    use std::borrow::Cow;
+
+    fn abs_all(input: &mut Cow<[i32]>) {
+        for i in 0..input.len() {
+            let v = input[i];
+            if v < 0 {
+                input.to_mut()[i] = -v;
+            }
+        }
+    }
+
+    // No clone occurs because input doesn't need to be mutated
+    let slice = [0,1,2];
+    let mut input = Cow::from(&slice[..]);
+    abs_all(&mut input);
+
+    // clone occurs because input needs to be mutated
+    let slice = [0,1,2];
+    let mut input = Cow::from(&slice[..]);
+    abs_all(&mut input);
+
+    // no clone occurs because input is already owned
+    let mut input = Cow::from(vec![-1,0,1]);
+    abs_all(&mut input);
+
+    // Keep a COW in struct
+
+    struct Items<'a, X:'a>
+        where [X]: ToOwned<Owned = Vec<X>> {
+        values: Cow<'a, [X]>,
+    }
+
+    impl<'a, X: Clone + 'a> Items<'a, X> where [X]: ToOwned<Owned = Vec<X>> {
+        fn new(v: Cow<'a,[x]>) -> Self {
+            Items {
+                values: v
+            }
+        }
+    }
+
+    // creates a container from borrowed values of a slice
+    let readonly = [1,2];
+    let borrowed = Items::new((&readonly[..].into()));
+    match borrowed {
+        Items { values: Cow::Borrowed(b) } => println!("borrowed {:?}", b),
+           _ => panic!("expect borrowed value")
+    }
+
+    let mut clone_on_write = borrowed;
+
+    // Mutates the data from slice into owned vec and pushes a new value on top
+    clone_on_write.values.to_mut().push(3);
+    println!("clone_on_write = {:?}", clone_on_write.values);
+
+    // The data was mutated. Let check it out
+    match clone_on_write {
+        Items { values: Cow::Owned(_) } => println!("clone_on_write contains owned data"),
+        _ => panic!("expect owned data")
+    }
+
 }
