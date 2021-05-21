@@ -209,7 +209,8 @@ fn main() {
 
     // Chapter 12 project
     block_print_chap("An I/O Project: Building a Command Line Program", "12");
-    project();
+    // turned this off to avoid passing search string and file name
+    // project();
 
     // Chapter 13
     block_print_chap("Functional Language Features: Iterators and Closures", "13");
@@ -250,5 +251,31 @@ fn main() {
     chp_1_3_async_await_primer();
 
     // other smart pointers
-    cow::cow();
+    cow();
+
+    use std::borrow::Cow;
+
+    let x = vec![3, 23, 43, 32];
+    let mut y: Vec<i32> = Cow::from(&x[..2]).into();
+    println!("{:?}", &y);
+    y.push(10000);
+    println!("x => {:?}  y = {:?}", x, y);
+
+    #[derive(Debug)]
+    struct Thing {
+        name: String,
+    }
+
+    impl Thing {
+        fn new(name: String) -> Self {
+            Thing { name }
+        }
+    }
+
+    let x = Thing::new(String::from("David"));
+
+    match x {
+        Thing { name: x } => println!("{}", x),
+        _ => panic!("should have had value"),
+    }
 }
