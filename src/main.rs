@@ -44,13 +44,13 @@ mod async_rust; // directory matching name with mod.rs
 */
 
 /*
- *** note I couldn't say rust_book::mod_test3 because it's not in main or lib
-     thus I had to declare the mod for scope above and then use it.
+*** note I couldn't say rust_book::mod_test3 because it's not in main or lib
+    thus I had to declare the mod for scope above and then use it.
 
-     For all mod tests you could just say mod and then prefix everything
-     but for most cases you would have several imports so to avoid all the prefixes use what
-     you are going to.
- */
+    For all mod tests you could just say mod and then prefix everything
+    but for most cases you would have several imports so to avoid all the prefixes use what
+    you are going to.
+*/
 use mod_test::mod1::test_string;
 use mod_test3::blah::blah;
 // import as alias
@@ -60,11 +60,14 @@ use async_rust::chapter_1::chp_1_3_async_await_primer;
 
 // all rust_book mods exists in lib
 use rust_book::trial::some_included_lib_function;
-use rust_book::trial2::{another_mod_test, call_it};
 use rust_book::trial2::chapters::chapters_9::nesting_mods;
+use rust_book::trial2::{another_mod_test, call_it};
 // import all from chapters mod
 use rust_book::chapters::*;
 
+use chapter_10::{
+    traits_defining_shared_behavior, using_generic_data_types, validating_references_with_lifetimes,
+};
 use chapter_3::chapter3_1::vars_and_mutability;
 use chapter_3::{control_flow, data_types, functions};
 use chapter_4::*;
@@ -72,9 +75,6 @@ use chapter_5::{defining_and_init_structs, using_structs_and_method_syntax};
 use chapter_6::{enum_and_flow_control, enums};
 use chapter_8::{working_with_hashmap, working_with_vectors};
 use chapter_9::recoverable_errors_with_result;
-use chapter_10::{
-    traits_defining_shared_behavior, using_generic_data_types, validating_references_with_lifetimes,
-};
 // Chapter 11 is all included in lib.rs
 use chapter_12::project;
 use chapter_13::{closures, iterators};
@@ -87,9 +87,9 @@ use chapter_15_4_thru_6::{
 };
 use chapter_16::{fearless_concurrency, using_msg_passing_to_trns_data_btwn_threads};
 use chapter_17::{characteristics_of_oop, encoding_states_and_behavior_as_types};
-use chapter_18::{patterns_and_matching};
+use chapter_18::patterns_and_matching;
 use chapter_19::advanced_features;
-
+use rust_book::other_smart_pointers::cow;
 
 fn block_print_chap(title: &str, chapter: &str) {
     println!("\n*****************************************************************************");
@@ -249,66 +249,6 @@ fn main() {
     // Async Primer
     chp_1_3_async_await_primer();
 
-
-    // COW smart pointer
-    use std::borrow::Cow;
-
-    fn abs_all(input: &mut Cow<[i32]>) {
-        for i in 0..input.len() {
-            let v = input[i];
-            if v < 0 {
-                input.to_mut()[i] = -v;
-            }
-        }
-    }
-
-    // No clone occurs because input doesn't need to be mutated
-    let slice = [0,1,2];
-    let mut input = Cow::from(&slice[..]);
-    abs_all(&mut input);
-
-    // clone occurs because input needs to be mutated
-    let slice = [0,1,2];
-    let mut input = Cow::from(&slice[..]);
-    abs_all(&mut input);
-
-    // no clone occurs because input is already owned
-    let mut input = Cow::from(vec![-1,0,1]);
-    abs_all(&mut input);
-
-    // Keep a COW in struct
-
-    struct Items<'a, X:'a>
-        where [X]: ToOwned<Owned = Vec<X>> {
-        values: Cow<'a, [X]>,
-    }
-
-    impl<'a, X: Clone + 'a> Items<'a, X> where [X]: ToOwned<Owned = Vec<X>> {
-        fn new(v: Cow<'a,[x]>) -> Self {
-            Items {
-                values: v
-            }
-        }
-    }
-
-    // creates a container from borrowed values of a slice
-    let readonly = [1,2];
-    let borrowed = Items::new((&readonly[..].into()));
-    match borrowed {
-        Items { values: Cow::Borrowed(b) } => println!("borrowed {:?}", b),
-           _ => panic!("expect borrowed value")
-    }
-
-    let mut clone_on_write = borrowed;
-
-    // Mutates the data from slice into owned vec and pushes a new value on top
-    clone_on_write.values.to_mut().push(3);
-    println!("clone_on_write = {:?}", clone_on_write.values);
-
-    // The data was mutated. Let check it out
-    match clone_on_write {
-        Items { values: Cow::Owned(_) } => println!("clone_on_write contains owned data"),
-        _ => panic!("expect owned data")
-    }
-
+    // other smart pointers
+    cow::cow();
 }
