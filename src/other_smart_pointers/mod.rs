@@ -1,3 +1,5 @@
+use futures::StreamExt;
+
 pub fn cow() {
     use std::borrow::Cow;
 
@@ -67,4 +69,73 @@ pub fn cow() {
         } => println!("clone_on_write contains owned data"),
         _ => panic!("expect owned data"),
     }
+}
+
+pub fn trial_cow_obj_destruct_match() {
+    use std::borrow::Cow;
+
+    // working with Cow on my own
+    let x = vec![3, 23, 43, 32];
+    let mut y: Vec<i32> = Cow::from(&x[..2]).into();
+    println!("{:?}", &y);
+    y.push(10000);
+    println!("x => {:?}  y = {:?}", x, y);
+
+
+    // destruct value from match
+    #[derive(Debug )]
+    struct Thing {
+        name: String,
+    }
+
+    impl Thing {
+        fn new(name: String) -> Self {
+            Thing { name }
+        }
+    }
+
+    impl Iterator for Thing {
+        type Item = String;
+
+        fn next(&mut self) -> Option<Self::Item> {
+            Some((&self.name).parse().unwrap())
+        }
+    }
+
+    let x = Thing::new(String::from("David"));
+
+    match x {
+        Thing { name: x } => println!("{}", x),
+        _ => panic!("should have had value"),
+    }
+
+
+    // making a mutable refer and owned example
+    // d is owned
+    let mut d = vec![1,2,3,43,44];
+    d.iter().for_each(|x| println!("{}", x + 1));
+
+    // d is ref
+    let mut d = &mut vec![1,2,3,43,44];
+    d.iter().for_each(|x| println!("{}", x + 1));
+
+
+    let x = vec![Thing {name: String::from("Dave")}
+                                  , Thing {name: String::from("Dave")}];
+
+    // for d in x {
+    //     println!("{}", d.name)
+    // }
+
+    fn names(thing_name: Thing) -> String {
+        thing_name.name
+    }
+
+    // let names: Vec<String> = x.into_iter().map(names).collect();
+    // OR
+    let names: Vec<String> = x.into_iter().map(|x| x.name).collect();
+
+    println!("{:?}", names);
+
+
 }

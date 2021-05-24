@@ -89,7 +89,7 @@ use chapter_16::{fearless_concurrency, using_msg_passing_to_trns_data_btwn_threa
 use chapter_17::{characteristics_of_oop, encoding_states_and_behavior_as_types};
 use chapter_18::patterns_and_matching;
 use chapter_19::advanced_features;
-use rust_book::other_smart_pointers::cow;
+use rust_book::other_smart_pointers::{cow, trial_cow_obj_destruct_match};
 
 fn block_print_chap(title: &str, chapter: &str) {
     println!("\n*****************************************************************************");
@@ -252,30 +252,7 @@ fn main() {
 
     // other smart pointers
     cow();
+    trial_cow_obj_destruct_match();
 
-    use std::borrow::Cow;
 
-    let x = vec![3, 23, 43, 32];
-    let mut y: Vec<i32> = Cow::from(&x[..2]).into();
-    println!("{:?}", &y);
-    y.push(10000);
-    println!("x => {:?}  y = {:?}", x, y);
-
-    #[derive(Debug)]
-    struct Thing {
-        name: String,
-    }
-
-    impl Thing {
-        fn new(name: String) -> Self {
-            Thing { name }
-        }
-    }
-
-    let x = Thing::new(String::from("David"));
-
-    match x {
-        Thing { name: x } => println!("{}", x),
-        _ => panic!("should have had value"),
-    }
 }
