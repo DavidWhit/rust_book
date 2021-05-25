@@ -165,8 +165,10 @@ pub fn chp_1_3_async_await_primer(){
    synchronous code.
    prefixing async to the function transforms the block of code into a state machine that implements
    a trait called Future.
-   Where as calling a blocking function in a synchronous method would block the whole thread, blocked
+
+   ***  Where as calling a blocking function in a synchronous method would block the whole thread, blocked
    Future/s will yield control of the thread allowing other Future/s to run.
+   ***
 
    adding futures dependency cargo.toml
    [dependencies]
@@ -180,8 +182,65 @@ pub fn chp_1_3_async_await_primer(){
     // the value returned by an async fn is a Future that in turn needs to run on an executor
     // because they are inherently lazy
 
-    let future = hello_future();
-    block_on(future);
 
+    // block_on blocks the current thread until the provided future has run to completion.
+    // Other executors provide more complex behavior, like scheduling multiples futures onto
+    // the same thread.
+    let future = hello_future();
+    block_on(future); // future is ran now because it was polled as they are inherit lazy
+
+    /*
+    Inside an async fn you can use .await (like js) to wait for the completion of another type
+    that implements Future trait such as the output of async fn. Unlike block_on await
+    doesn't block the current thread but instead async waits for the future to complete
+    allowing other tasks to run if the future is currently unable to make progress.
+
+    For example imagine that we have three async fn:
+    IE:
+    async fn lear_song
+    async fn sing_song
+    async fn dance
+    */
+    // one way to do learn, sing and dance would be to block on each of these individually
+
+    /*
+    fn main() {
+        let song = block_on(learn_song());
+        block_on(sing_song(song));
+        block_on(dance());
+    }
+
+    obviously blocking on each isn't the best performance as things are happening in sync order
+    We have to learn the song before we can sing it but it's possible to dance at the same time
+    as learning and signing the song. To do this we can create two separate async fn which can be
+    run concurrently
+
+    async fn learn_and_sing() {
+        // wait till the song is learned before singing it
+        let song = learn_song().await;
+        sing_song(song).await;
+    }
+
+   async fn async_main() {
+    let f1 = learn_and_sing();
+    let f2 = dance();
+
+    futures::join!(f1,f2);
+
+     // `join!` is like `.await` but can wait for multiple futures concurrently.
+    // If we're temporarily blocked in the `learn_and_sing` future, the `dance`
+    // future will take over the current thread. If `dance` becomes blocked,
+    // `learn_and_sing` can take back over. If both futures are blocked, then
+    // `async_main` is blocked and will yield to the executor.
+
+   }
+
+   fn main() {
+    block_on(async_main());
+
+    // if we blocked on learn_song in learn_and_sing the thread wouldn't be able to do anything
+    else while learn_song was running; making it impossible to dance at the same time.
+   }
+   */
 
 }

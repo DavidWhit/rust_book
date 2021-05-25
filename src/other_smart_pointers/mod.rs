@@ -138,4 +138,11 @@ pub fn trial_cow_obj_destruct_match() {
     println!("{:?}", names);
 
 
+    let mut x = Box::new(6);
+
+    // the value the box pointer on the stack pointing to value on the heap.
+    *x= *x + 6;
+
+    println!("{}", x);
+
 }
