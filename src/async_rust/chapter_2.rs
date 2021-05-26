@@ -163,13 +163,20 @@ fn under_the_hood_futures_and_tasks() {
 */
 }
 
-use std::{
-    future::Future,
-    pin::Pin,
-    sync::{Arc,Mutex},
-    task::{Context, Poll, Waker},
-    thread,
-    time::Duration,
+use {
+    futures:: {
+        future::{ BoxFuture, FutureExt},
+        task::{waker_ref, ArcWake},
+    },
+    std::{
+        future::{Future},
+        pin::Pin,
+        sync::{Arc,Mutex},
+        sync::mpsc::{sync_channel, Receiver, SyncSender },
+        task::{Context, Poll, Waker },
+        thread,
+        time::Duration,
+    }
 };
 
 pub fn task_wakeups_with_waker() {
@@ -192,7 +199,7 @@ pub fn task_wakeups_with_waker() {
      */
 
     pub struct TimerFuture {
-        shared_state: Arc<Mutex<SharedStated>>
+        shared_state: Arc<Mutex<SharedState>>
     }
 
     struct SharedState {
@@ -203,7 +210,7 @@ pub fn task_wakeups_with_waker() {
     impl Future for TimerFuture {
         type Output = ();
 
-        fn poll(self: Pin<&mut self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+        fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
             let mut shared_state = self.shared_state.lock().unwrap();
             if shared_state.completed {
                 Poll::Ready(())
@@ -227,4 +234,139 @@ pub fn task_wakeups_with_waker() {
     have moved to a different task with a different Waker. This will happen when futures are passed
     around between tasks after being polled.
      */
+
+    // Finally create an API to actually construct the timer and start a thread
+
+    impl TimerFuture {
+        pub fn new(duration:Duration) -> Self {
+            let shared_state = Arc::new(Mutex::new(SharedState { completed: false, waker: None}));
+
+            let thread_shared_state = shared_state.clone();
+            thread::spawn(move || {
+                thread::sleep(duration);
+                let mut shared_state = thread_shared_state.lock().unwrap();
+                shared_state.completed = true;
+                if let Some(waker) = shared_state.waker.take() {
+                    waker.wake()
+                }
+            });
+
+            TimerFuture { shared_state }
+        }
+    }
+    // Now an executor
+
+    /*
+    This will work by sending tasks to run over a channel. The executor will pull events off of the
+    channel and run them. When a task is ready to do more work (is awakened) it can schedule itself
+    to be polled again by putting itself back onto the channel.
+
+     In this desing, the executor itself just needs receiving end of the task channel. The user will
+     get a sending end so that they can spawn new futures. Tasks themselves are just futures that can
+     reschedule themselves, so we'll store them as a future paired with a sender that the task can use
+     to requeue itself
+    */
+
+    // Task executor that receives tasks off of a channel and runs them.
+    struct Executor {
+        ready_queue: Receiver<Arc<Task>>,
+    }
+
+    // When a waker is created from an Arc<Task> calling wake() on it will cause a copy of the Arc
+    // to be sent onto the task channel. Our executor then needs to pick up the task and poll it.
+
+    impl Executor {
+        fn run(&self) {
+            while let Ok(task) = self.ready_queue.recv() {
+                // Take the future and if it has not yet completed (is still some)
+
+                let mut future_slot = task.future.lock().unwrap();
+                if let Some(mut future) = future_slot.take() {
+                    let waker = waker_ref(&task);
+                    let context = &mut Context::from_waker(&*waker);
+
+                    if let Poll::Pending = future.as_mut().poll(context) {
+                        // Not done put it back in its task to be run again
+                        *future_slot = Some(future);
+                    }
+                }
+            }
+        }
+    }
+
+    // 'spawner' spawns new futures onto the task channel
+    #[derive(Clone)]
+    struct Spawner {
+        task_sender: SyncSender<Arc<Task>>
+    }
+
+    // Add a spawner to make it easy to spawn new futures
+    // taking a box future and create a new task
+
+    impl Spawner {
+        fn spawn(&self, future:impl Future<Output = ()> + 'static + Send) {
+           let future = future.boxed();
+            let task = Arc::new(Task { future: Mutex::new(Some(future)),
+            task_sender: self.task_sender.clone()});
+            self.task_sender.send(task).expect("too many tasks queued");
+        }
+    }
+
+    // A future that can reschedule self to be polled by an Executor
+    struct Task {
+        /*
+        In progress future that should be pushed to completion.
+
+        The mutex is not necessary for correctness since we only have one thread executing tasks at once.
+        However Rust isnt smart enough to know that future is only mutated from one thread. So we need to
+        use Mutex to prove thread-safety. A production executor would not need this and could use
+        unsafeCell instead.
+        */
+
+        future: Mutex<Option<BoxFuture<'static,() >>>,
+        // Handle to place the task itself back onto the task queue
+        task_sender: SyncSender<Arc<Task>>
+    }
+
+    // To poll futures we need to create a Waker
+    // recall wakers are responsible for scheduling a task to be polled again once wake is called.
+    // Remember that Wakers tell the executor exactly which task has become ready
+    // allowing them to poll just the futures that are ready to make progress
+    // The easiest way is by using ArcWake trait and then using the waker_ref or into_waker() func
+    // to turn an Arc<impl ArcWake> into a Waker
+
+    impl ArcWake for Task {
+        fn wake_by_ref(arc_self: &Arc<Self>) {
+            let cloned = arc_self.clone();
+            arc_self
+                .task_sender
+                .send(cloned)
+                .expect("too many tasks queued")
+        }
+    }
+
+    fn new_executor_and_spawner() -> (Executor, Spawner)  {
+        // Max number of tasks allow queueing in the channel at once
+
+        // this is just to make the sync_channel happy and would be in a real executor
+        const MAX_QUEUED_TASKS:usize = 10_000;
+        let (task_sender, ready_queue) = sync_channel(MAX_QUEUED_TASKS);
+        (Executor {ready_queue}, Spawner { task_sender} )
+    }
+
+
+    let (executor, spawner) = new_executor_and_spawner();
+
+
+    // spawn a task to print before and after waiting on a timer
+    spawner.spawn(async {
+        println!("howdy!");
+        // wait
+        TimerFuture::new(Duration::new(2, 0)).await;
+        println!("done!");
+    });
+
+    drop(spawner);
+    executor.run();
+
 }

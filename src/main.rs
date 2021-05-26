@@ -57,6 +57,8 @@ use mod_test3::blah::blah;
 use mod_test2::test_string as ch2test;
 // additional learning https://rust-lang.github.io/async-book/01_getting_started/02_why_async.html
 use async_rust::chapter_1::chp_1_3_async_await_primer;
+use async_rust::chapter_2::task_wakeups_with_waker;
+use async_rust::chapter_3::async_await;
 
 // all rust_book mods exists in lib
 use rust_book::trial::some_included_lib_function;
@@ -247,12 +249,13 @@ fn main() {
     block_print_chap("Advanced Features", "19");
     advanced_features();
 
-    // Async Primer
-    chp_1_3_async_await_primer();
-
     // other smart pointers
     cow();
     trial_cow_obj_destruct_match();
 
+    // Async Primer
+    chp_1_3_async_await_primer();
+    task_wakeups_with_waker();
+    async_await();
 
 }
