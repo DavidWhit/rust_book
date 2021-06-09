@@ -63,6 +63,7 @@ use async_rust::chapter_3::async_await;
 // self-trials at different topics
 use rust_book::trials::*;
 use iterators::trial_iterators;
+use rust_book::trials::serde::trial_serde;
 
 // all rust_book mods exists in lib
 use rust_book::trial::some_included_lib_function;
@@ -264,5 +265,6 @@ fn main() {
 
     // Personal Iterator trial
     trial_iterators();
+    trial_serde();
 
 }

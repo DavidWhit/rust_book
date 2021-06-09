@@ -153,7 +153,14 @@ name = "rust_book"
 version = "0.1.0"
 dependencies = [
  "futures",
+ "serde",
 ]
+
+[[package]]
+name = "serde"
+version = "1.0.126"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ec7505abeacaec74ae4778d9d9328fe5a5d04253220a85c4ee022239fc996d03"
 
 [[package]]
 name = "slab"
