@@ -4,6 +4,7 @@
 
 pub mod chapters;
 pub mod other_smart_pointers;
+pub mod trials;
 pub mod trial;
 pub mod trial2;
 

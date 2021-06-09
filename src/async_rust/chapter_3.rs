@@ -49,12 +49,12 @@ pub fn async_await() {
     //     borrow_x(&x) // Error: x does not live long enough
     // }
 
-    fn good() -> impl Future<Output = u8> {
-        async {
-            let x = 5;
-            borrow_x(&x).await
-        }
-    }
+    // fn good() -> impl Future<Output = u8> {
+    //     async {
+    //         let x = 5;
+    //         borrow_x(&x).await
+    //     }
+    // }
 
     // *********** async move
     /*
@@ -84,7 +84,46 @@ pub fn async_await() {
             println!("{}", my_string);
         }
     }
-    
+
     //
+
+
+    #[derive(Debug)]
+    enum Sex {
+        Male,
+        Female
+    }
+
+    #[derive(Debug)]
+    struct Dave {
+        built: u8,
+        sex: Sex,
+        age: Option<u8>,
+        height: Option<u8>,
+    }
+
+    impl Dave {
+        fn new(built: u8, sex: Sex ) -> Dave {
+            Dave {
+                built,sex, age: None, height: None
+            }
+        }
+
+        fn set_height(mut self, height: u8) -> Self{
+            self.height  = Some(height);
+            self
+        }
+        fn set_age(&mut self, age: u8) -> &mut Self  {
+            self.age  = Some(age);
+            self
+        }
+
+
+    }
+
+    // you can do this because it is not yet assigned to x or pre-consumption of ownership
+    let x = Dave::new(8, Sex::Male).set_height(6);
+
+    println!("{:?}", x);
 
 }

@@ -60,6 +60,10 @@ use async_rust::chapter_1::chp_1_3_async_await_primer;
 use async_rust::chapter_2::task_wakeups_with_waker;
 use async_rust::chapter_3::async_await;
 
+// self-trials at different topics
+use rust_book::trials::*;
+use iterators::trial_iterators;
+
 // all rust_book mods exists in lib
 use rust_book::trial::some_included_lib_function;
 use rust_book::trial2::chapters::chapters_9::nesting_mods;
@@ -257,5 +261,8 @@ fn main() {
     chp_1_3_async_await_primer();
     task_wakeups_with_waker();
     async_await();
+
+    // Personal Iterator trial
+    trial_iterators();
 
 }
